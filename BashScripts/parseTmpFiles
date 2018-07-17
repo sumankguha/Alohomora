@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+
+# Helper section
+# --------------
+read -d '' usage << "BLOCK"
+DESCRIPTION:
+
+USAGE:
+
+INPUT FLAGS:
+
+EXAMPLE:
+
+VERSION: 1.0
+RELEASE DATE: Wed Nov 07 2017
+AUTHOR: Suman Guha
+BLOCK
+
+# Input section
+# -------------
+
+# Converting flags from long form to short form
+for opt in $@; do
+	shift
+	case $opt in
+		--help) 	set -- $@ -h;;
+		--file)		set -- $@ -f;;
+		*)		set -- $@ $opt;;
+	esac
+done
+
+# Setting parameters according to flags
+while getopts "hf:" opt; do
+	case $opt in
+		h) echo "$usage"; exit 0;;
+		f) fileName=$OPTARG;;
+	esac
+done
+
+# Algorithm and main function:
+# ----------------------------
+outputFileName=$(echo $fileName | sed -e 's/.tmp/.csv/')
+#echo $outputFileName
+line1=$(awk '/E:/ {print FNR}' $fileName)
+line2=$(awk '/F:/ {print FNR}' $fileName)
+line3=$(awk '/G:/ {print FNR}' $fileName)
+line4=$(wc -l < $fileName)
+#echo $line1
+#echo $line2
+#echo $line3
+#echo $line4
+corrLeverPress=$(awk -v s="$line1" -v e="$line2" 'NR>s && NR<e' $fileName | sed -e 's/.*: //g')
+incorrLeverPress=$(awk -v s="$line2" -v e="$line3" 'NR>s && NR<e' $fileName | sed -e 's/.*: //g')
+rewards=$(awk -v s="$line3" -v e="$line4" 'NR>s && NR<e' $fileName | sed -e 's/.*: //g')
+#
+#echo $corrLeverPress
+#echo $incorrLeverPress
+#echo $rewards
+header="CorrLeverPress"
+values=$(printf "%s\n" $corrLeverPress)
+corrLeverPress=$(printf "%s\n%s" "$header" "$values")
+#printf "%s\n" $corrLeverPress
+
+header="IncorrLeverPress"
+values=$(printf "%s\n" $incorrLeverPress)
+incorrLeverPress=$(printf "%s\n%s" "$header" "$values")
+#printf "%s\n" $incorrLeverPress
+
+header="Rewards"
+values=$(printf "%s\n" $rewards)
+rewards=$(printf "%s\n%s" "$header" "$values")
+#printf "%s\n" $rewards
+
+paste <(printf "%s\n" $corrLeverPress) <(printf "%s\n" $incorrLeverPress) <(printf "%s\n" $rewards) | column -t > $outputFileName
