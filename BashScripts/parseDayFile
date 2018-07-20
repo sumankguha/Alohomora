@@ -19,15 +19,14 @@ BLOCK
 
 makeTmpFiles() # Parses individual subject/animal record into its separate file
 {
-# 1. Generate array of start and end line numbers for each animal
-# Generate line numbers where records start for individual animal --> Records for individual animals are separated by "Start Date:" and the last line of the whole file gives the end of the last record
-	fileName=$1
-	tr -d '\r' < $fileName > tempFile
-	rm $fileName
-	mv tempFile $fileName
-	endLine=$(wc -l < $fileName)
-	endLine=$(( $endLine + 1 )) # adding one to total line numbers because later the end is set as endLine - 1
-	lineNums=($(awk '/Start\ Date:/ {print FNR}' $fileName) $endLine)
+	# 1. Generate array of start and end line numbers for each animal
+	# Generate line numbers where records start for individual animal --> Records for individual animals are separated by "Start Date:" and the last line of the whole file gives the end of the last record
+	#tr -d '\r' < $fileName > tempFile
+	#rm $fileName
+	#mv tempFile $fileName
+	#endLine=$(wc -l < $fileName)
+	#endLine=$(( $endLine + 1 )) # adding one to total line numbers because later the end is set as endLine - 1
+	#lineNums=($(awk '/Start\ Date:/ {print FNR}' $fileName) $endLine)
 
 	# 1.2. Generate and array(s) meta-data variables
 	date="$(awk 'BEGIN {FS="!"} NR==1 {print $2}' $fileName)" #fist line of the day file has the date in the desired format and is preceded by ! which is used as a record separator
@@ -35,54 +34,59 @@ makeTmpFiles() # Parses individual subject/animal record into its separate file
 	experimentList=($(awk '/Experiment: / {print $2}' $fileName))
 	groupList=($(awk '/Group: / {print $2}' $fileName))
 
-	# 2. Splice and save individual animal record in .tmp files
-	# -----------------------------------------------------------
-	subjectNums=$(( ${#subjectList[@]} - 1 ))
-	for i in $(seq 0 $subjectNums)
-	do
-		tmpFile=$(echo $date"_"${experimentList[i]}"_"${groupList[i]}"_"${subjectList[$i]}.tmp)
-		startLine=${lineNums[$i]}
-		endLine=${lineNums[(( $i + 1 ))]}
-		endLine=$(( $endLine - 1 ))
-		sed -n "${startLine}, ${endLine}p" $fileName > $tmpFile
-	done
+	## 2. Splice and save individual animal record in .tmp files
+	## -----------------------------------------------------------
+	#subjectNums=$(( ${#subjectList[@]} - 1 ))
+	#for i in $(seq 0 $subjectNums)
+	#do
+	#	tmpFile=$(echo $date"_"${experimentList[i]}"_"${groupList[i]}"_"${subjectList[$i]}.tmp)
+	#	startLine=${lineNums[$i]}
+	#	endLine=${lineNums[(( $i + 1 ))]}
+	#	endLine=$(( $endLine - 1 ))
+	#	sed -n "${startLine}, ${endLine}p" $fileName > $tmpFile
+	#done
 }
 
 makeCSV() # Parse indivual .tmp file to CSV files
 {
-	outputFileName=$(echo $fileName | sed -e 's/.tmp/.csv/')
-	#echo $outputFileName
-	line1=$(awk '/E:/ {print FNR}' $fileName)
-	line2=$(awk '/F:/ {print FNR}' $fileName)
-	line3=$(awk '/G:/ {print FNR}' $fileName)
-	line4=$(wc -l < $fileName)
-	#echo $line1
-	#echo $line2
-	#echo $line3
-	#echo $line4
-	corrLeverPress=$(awk -v s="$line1" -v e="$line2" 'NR>s && NR<e' $fileName | sed -e 's/.*: //g')
-	incorrLeverPress=$(awk -v s="$line2" -v e="$line3" 'NR>s && NR<e' $fileName | sed -e 's/.*: //g')
-	rewards=$(awk -v s="$line3" -v e="$line4" 'NR>s && NR<e' $fileName | sed -e 's/.*: //g')
-	#
-	#echo $corrLeverPress
-	#echo $incorrLeverPress
-	#echo $rewards
-	header="CorrLeverPress"
-	values=$(printf "%s\n" $corrLeverPress)
-	corrLeverPress=$(printf "%s\n%s" "$header" "$values")
-	#printf "%s\n" $corrLeverPress
-
-	header="IncorrLeverPress"
-	values=$(printf "%s\n" $incorrLeverPress)
-	incorrLeverPress=$(printf "%s\n%s" "$header" "$values")
-	#printf "%s\n" $incorrLeverPress
-
-	header="Rewards"
-	values=$(printf "%s\n" $rewards)
-	rewards=$(printf "%s\n%s" "$header" "$values")
+	for tmpFile in $(echo $(ls $date*.tmp))
+	do
+		outputFileName=$(echo $tmpFile | sed -e 's/.tmp/.csv/')
+		echo $outputFileName
+		line1=$(awk '/E:/ {print FNR}' $tmpFile)
+		line2=$(awk '/F:/ {print FNR}' $tmpFile)
+		line3=$(awk '/G:/ {print FNR}' $tmpFile)
+		line4=$(wc -l < $tmpFile)
+		#echo $line1
+		#echo $line2
+		#echo $line3
+		#echo $line4
+		corrLeverPress=$(awk -v s="$line1" -v e="$line2" 'NR>s && NR<e' $tmpFile | sed -e 's/.*: //g' | sed -e 's/ 0\.000//g')
+		incorrLeverPress=$(awk -v s="$line2" -v e="$line3" 'NR>s && NR<e' $tmpFile | sed -e 's/.*: //g' | sed -e 's/ 0\.000//g')
+		rewards=$(awk -v s="$line3" -v e="$line4" 'NR>s && NR<e' $tmpFile | sed -e 's/.*: //g' | sed -e 's/ 0\.000//g')
+		corr_varNum=$(echo $corrLeverPress | awk 'BEGIN{RS=" "; OFS=","} END{print FNR}')
+		incorr_varNum=$(echo $incorrLeverPress | awk 'BEGIN{RS=" "; OFS=","} END{print FNR}')
+		reward_varNum=$(echo $rewards | awk 'BEGIN{RS=" "; OFS=","} END{print FNR}')
+		echo $corrLeverPress
+		echo $incorrLeverPress
+		echo $rewards
+		echo $corr_varNum $incorr_varNum $reward_varNum
+		read -n 1
+ 	done
+	#header="CorrLeverPress"
+	#values=$(printf "%s\n" $corrLeverPress)
+	#corrLeverPress=$(printf "%s\n%s" "$header" "$values")
+	##printf "%s\n" $corrLeverPress
+	#header="IncorrLeverPress"
+	#values=$(printf "%s\n" $incorrLeverPress)
+	#incorrLeverPress=$(printf "%s\n%s" "$header" "$values")
+	##printf "%s\n" $incorrLeverPress
+	#header="Rewards"
+	#values=$(printf "%s\n" $rewards)
+	#rewards=$(printf "%s\n%s" "$header" "$values")
 	#printf "%s\n" $rewards
 
-	paste <(printf "%s\n" $corrLeverPress) <(printf "%s\n" $incorrLeverPress) <(printf "%s\n" $rewards) | column -t > $outputFileName
+
 }
 
 # 2. Input section
@@ -110,7 +114,8 @@ done
 
 # 1. Split day file into separate .tmp file per animal
 # ----------------------------------------------------
-makeTmpFiles $fileName
+makeTmpFiles
+makeCSV
 
 # 2. Load individual animal's day file and make .csv files that show reward, correct lever press, and incorrect lever press timings
 # ---------------------------------------------------------------------------------------------------------------------------------
