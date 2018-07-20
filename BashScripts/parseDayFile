@@ -19,17 +19,21 @@ BLOCK
 
 makeTmpFiles() # Parses individual subject/animal record into its separate file
 {
-	# 1. Generate array of start and end line numbers for each animal
-	# Generate line numbers where records start for individual animal --> Records for individual animals are separated by "Start Date:" and the last line of the whole file gives the end of the last record
-	endLine=$(wc -l < $1)
+# 1. Generate array of start and end line numbers for each animal
+# Generate line numbers where records start for individual animal --> Records for individual animals are separated by "Start Date:" and the last line of the whole file gives the end of the last record
+	fileName=$1
+	tr -d '\r' < $fileName > tempFile
+	rm $fileName
+	mv tempFile $fileName
+	endLine=$(wc -l < $fileName)
 	endLine=$(( $endLine + 1 )) # adding one to total line numbers because later the end is set as endLine - 1
-	lineNums=($(awk '/Start\ Date:/ {print FNR}' $1) $endLine)
+	lineNums=($(awk '/Start\ Date:/ {print FNR}' $fileName) $endLine)
 
 	# 1.2. Generate and array(s) meta-data variables
-	date="$(awk 'BEGIN {FS="!"} NR==1 {print $2}' $1)" #fist line of the day file has the date in the desired format and is preceded by ! which is used as a record separator
-	subjectList=($(awk '/Subject:/ {print $2}' $1)) #second record seems to be the name of the animals while the first record acts as the identifying pattern
-	experimentList=($(awk '/Experiment: / {print $2}' $1))
-	groupList=($(awk '/Group: / {print $2}' $1))
+	date="$(awk 'BEGIN {FS="!"} NR==1 {print $2}' $fileName)" #fist line of the day file has the date in the desired format and is preceded by ! which is used as a record separator
+	subjectList=($(awk '/Subject:/ {print $2}' $fileName)) #second record seems to be the name of the animals while the first record acts as the identifying pattern
+	experimentList=($(awk '/Experiment: / {print $2}' $fileName))
+	groupList=($(awk '/Group: / {print $2}' $fileName))
 
 	# 2. Splice and save individual animal record in .tmp files
 	# -----------------------------------------------------------
@@ -40,7 +44,7 @@ makeTmpFiles() # Parses individual subject/animal record into its separate file
 		startLine=${lineNums[$i]}
 		endLine=${lineNums[(( $i + 1 ))]}
 		endLine=$(( $endLine - 1 ))
-		sed -n "${startLine}, ${endLine}p" $1 > $tmpFile
+		sed -n "${startLine}, ${endLine}p" $fileName > $tmpFile
 	done
 }
 
