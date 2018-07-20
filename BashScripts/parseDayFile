@@ -1,0 +1,112 @@
+# 0. HELPER SECTION
+# -----------------
+read -d '' usage << "BLOCK"
+DESCRIPTION:
+This script gathers a
+USAGE:
+
+INPUT FLAGS:
+
+EXAMPLE:
+
+VERSION: 1.0
+RELEASE DATE: Wed Nov 07 2017
+AUTHOR: Suman Guha
+BLOCK
+
+# 1. FUNCTION SECTION
+# -------------------
+
+makeTmpFiles() # Parses individual subject/animal record into its separate file
+{
+	# 1. Generate array of start and end line numbers for each animal
+	# Generate line numbers where records start for individual animal --> Records for individual animals are separated by "Start Date:" and the last line of the whole file gives the end of the last record
+	endLine=$(wc -l < $1)
+	endLine=$(( $endLine + 1 )) # adding one to total line numbers because later the end is set as endLine - 1
+	lineNums=($(awk '/Start\ Date:/ {print FNR}' $1) $endLine)
+
+	# 1.2. Generate and array(s) meta-data variables
+	date="$(awk 'BEGIN {FS="!"} NR==1 {print $2}' $1)" #fist line of the day file has the date in the desired format and is preceded by ! which is used as a record separator
+	subjectList=($(awk '/Subject:/ {print $2}' $1)) #second record seems to be the name of the animals while the first record acts as the identifying pattern
+	experimentList=($(awk '/Experiment: / {print $2}' $1))
+	groupList=($(awk '/Group: / {print $2}' $1))
+
+	# 2. Splice and save individual animal record in .tmp files
+	# -----------------------------------------------------------
+	subjectNums=$(( ${#subjectList[@]} - 1 ))
+	for i in $(seq 0 $subjectNums)
+	do
+		tmpFile=$(echo $date"_"${experimentList[i]}"_"${groupList[i]}"_"${subjectList[$i]}.tmp)
+		startLine=${lineNums[$i]}
+		endLine=${lineNums[(( $i + 1 ))]}
+		endLine=$(( $endLine - 1 ))
+		sed -n "${startLine}, ${endLine}p" $1 > $tmpFile
+	done
+}
+
+makeCSV() # Parse indivual .tmp file to CSV files
+{
+	outputFileName=$(echo $fileName | sed -e 's/.tmp/.csv/')
+	#echo $outputFileName
+	line1=$(awk '/E:/ {print FNR}' $fileName)
+	line2=$(awk '/F:/ {print FNR}' $fileName)
+	line3=$(awk '/G:/ {print FNR}' $fileName)
+	line4=$(wc -l < $fileName)
+	#echo $line1
+	#echo $line2
+	#echo $line3
+	#echo $line4
+	corrLeverPress=$(awk -v s="$line1" -v e="$line2" 'NR>s && NR<e' $fileName | sed -e 's/.*: //g')
+	incorrLeverPress=$(awk -v s="$line2" -v e="$line3" 'NR>s && NR<e' $fileName | sed -e 's/.*: //g')
+	rewards=$(awk -v s="$line3" -v e="$line4" 'NR>s && NR<e' $fileName | sed -e 's/.*: //g')
+	#
+	#echo $corrLeverPress
+	#echo $incorrLeverPress
+	#echo $rewards
+	header="CorrLeverPress"
+	values=$(printf "%s\n" $corrLeverPress)
+	corrLeverPress=$(printf "%s\n%s" "$header" "$values")
+	#printf "%s\n" $corrLeverPress
+
+	header="IncorrLeverPress"
+	values=$(printf "%s\n" $incorrLeverPress)
+	incorrLeverPress=$(printf "%s\n%s" "$header" "$values")
+	#printf "%s\n" $incorrLeverPress
+
+	header="Rewards"
+	values=$(printf "%s\n" $rewards)
+	rewards=$(printf "%s\n%s" "$header" "$values")
+	#printf "%s\n" $rewards
+
+	paste <(printf "%s\n" $corrLeverPress) <(printf "%s\n" $incorrLeverPress) <(printf "%s\n" $rewards) | column -t > $outputFileName
+}
+
+# 2. Input section
+# -------------
+# Converting flags from long form to short form
+for opt in $@; do
+	shift
+	case $opt in
+		--help) 	set -- $@ -h;;
+		--file)		set -- $@ -f;;
+		*)		set -- $@ $opt;;
+	esac
+done
+
+# Setting parameters according to flags
+while getopts "hf:" opt; do
+	case $opt in
+		h) echo "$usage"; exit 0;;
+		f) fileName=$OPTARG;;
+	esac
+done
+
+# 3. MAIN SECTION
+# ---------------
+
+# 1. Split day file into separate .tmp file per animal
+# ----------------------------------------------------
+makeTmpFiles $fileName
+
+# 2. Load individual animal's day file and make .csv files that show reward, correct lever press, and incorrect lever press timings
+# ---------------------------------------------------------------------------------------------------------------------------------
