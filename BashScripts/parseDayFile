@@ -1,3 +1,5 @@
+#! /usr/bin/env bash
+
 # 0. HELPER SECTION
 # -----------------
 read -d '' usage << "BLOCK"
