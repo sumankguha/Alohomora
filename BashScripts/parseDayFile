@@ -4,15 +4,29 @@
 # -----------------
 read -d '' usage << "BLOCK"
 DESCRIPTION:
-This script gathers a
-USAGE:
+This script runs over a day-file and splits it into  '.tmp' file for individual animal for data integrity check. Finally it saves .csv files for rewards, correct lever presses, and incorrect lever presses. The file naming convention is <DATE>_<EXPERIMENT NAME>_<GROUP>_<SUBJECT>_rewards/corrLever/incorrLever.csv. The meta data is injected into file name for analytics purposes later.
+
+USAGE: parseDayFile -FLAG(S)/--LONG_NAME_OF_FLAG(S) <ARGUMENTS>
 
 INPUT FLAGS:
+--file or -f	: the day file
 
 EXAMPLE:
+parseDayFile -f !2018-07-06
+parseDayFile --file !2018-07-06
 
-VERSION: 1.0
-RELEASE DATE: Wed Nov 07 2017
+This generates ...
+2018-07-06_ICSS+IVSA_1H_FEMALES_BE20.tmp
+2018-07-06_ICSS+IVSA_1H_FEMALES_BE20_rewards.csv
+2018-07-06_ICSS+IVSA_1H_FEMALES_BE20_corrLever.csv
+2018-07-06_ICSS+IVSA_1H_FEMALES_BE20_incorrLever.csv
+ ... and similar for other animals
+
+ CAVEAT:
+ The data is stored in the folder where the script is evoked.
+
+VERSION: 1.0 'BillionBunnies' (Because as of now it creates a billion files)
+RELEASE DATE: Sun July 22 2018
 AUTHOR: Suman Guha
 BLOCK
 
