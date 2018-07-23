@@ -89,11 +89,11 @@ makeCSV() # Parse indivual .tmp file to CSV files
 
 	# Saving data to file
 	outputFile=$(echo $outputFileName\_corrLever.csv)
-	echo $corrLeverPress | sed 's/ /,/g' > $outputFile
+	echo "CorrLever" $corrLeverPress | tr -s ' ' '\n' > $outputFile
 	outputFile=$(echo $outputFileName\_rewards.csv)
-	echo $rewards | sed 's/ /,/g' > $outputFile
+	echo "Rewards" $rewards | tr -s ' ' '\n' > $outputFile
 	outputFile=$(echo $outputFileName\_incorrLever.csv)
-	echo $incorrLeverPress | sed 's/ /,/g' > $outputFile
+	echo "IncorrLever"$incorrLeverPress | tr -s ' ' '\n' > $outputFile
 
 #	# Setting up maximum variable number so that number of padding characters can be calculated
 #	max_varNum=$incorr_varNum
