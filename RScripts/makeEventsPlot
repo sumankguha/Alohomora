@@ -1,1 +1,78 @@
 #! /usr/bin/env Rscript
+
+# 0. HELPER AND INPUT SECTION
+# ---------------------------
+
+# Loading libraries
+# -----------------
+library(argparser, quietly = TRUE)
+library(stringr, quietly = TRUE)
+library(readr, quietly = TRUE)
+library(ggplot2, quietly = TRUE)
+
+# Creating a parser
+# -----------------
+p <- arg_parser(
+  "SCRIPT DESCRIPTION:
+  This script runs over a .csv file to generate a reward dispension events plot per epoch.
+
+GRAPH/PLOT DESCRIPTION
+  X-Axis (1): Time in seconds from 0 to 3600 (for ShA) or 21600 (for LgA)
+  X-Axis (2): Rug plot showing individual reward times
+  Y-Axis (1): 60 s binned frequency distribution histogram of rewards (grey bars)
+  Y-Axis (2): 60 s binned frequency distribution histogram of correct lever press (green bars)
+  Y-Axis (3): 60 s binned frequency distribution histogram of incorrect lever press (red bars)"
+)
+
+# Add command line arguments
+# --------------------------
+p <- add_argument(p, "fileName", help="Name of .csv IVSA file", type="character") # primary argument(s)
+p <- add_argument(p, "--regimen", help="Type of IVSA regimen [Options = ShA, LgA]", type="character", default="ShA") # optional argument(s)
+
+# Parse command line arguments
+# ----------------------------
+argv <- parse_args(p)
+rewardFileName = argv$fileName
+regimen = argv$regimen
+
+# 1. MAIN FUNCTION
+# ----------------
+fileParts <- str_split(rewardFileName, "_")[[1]]
+date <- fileParts[1]
+cohort <- fileParts[2]
+regimen <- fileParts[3]
+group <- fileParts[4]
+subject <- fileParts[5]
+
+rewardsDataFile <- str_c(date, cohort, regimen, group, subject, "rewards.csv", sep = "_")
+corrLeverDataFile <- str_c(date, cohort, regimen, group, subject, "corrLever.csv", sep = "_")
+incorrLeverDataFile <- str_c(date, cohort, regimen, group, subject, "incorrLever.csv", sep = "_")
+
+#print(rewardsDataFile)
+#print(corrLeverDataFile)
+#print(incorrLeverDataFile)
+
+rewardTimes <- read_csv(rewardsDataFile, col_type = cols())
+corrLeverTimes <- read_csv(corrLeverDataFile, col_type = cols())
+incorrLeverTimes <- read_csv(incorrLeverDataFile, col_type = cols())
+
+
+#rewardTimes %>% print
+#corrLeverTimes %>% print
+#incorrLeverTimes %>% print
+plot_title <- str_c()
+if (regimen = "ShA") {
+  eventsPlot <- ggplot() +
+    geom_histogram(data = corrLeverTimes, aes(x = CorrLever), binwidth = 60, color = "green", alpha = 0.5) +
+    geom_histogram(data = incorrLeverTimes, aes(x = IncorrLever), binwidth = 60, color = "red", alpha = 0.5) +
+    geom_histogram(data = rewardTimes, aes(x = Rewards), binwidth = 60, color = "grey", alpha = 0.7) +
+    geom_rug(data = rewardTimes, aes(x = Rewards)) +
+    xlim(c(0,3600))
+} else {
+  eventsPlot <- ggplot() +
+    geom_histogram(data = corrLeverTimes, aes(x = CorrLever), binwidth = 60, color = "green", alpha = 0.5) +
+    geom_histogram(data = incorrLeverTimes, aes(x = IncorrLever), binwidth = 60, color = "red", alpha = 0.5) +
+    geom_histogram(data = rewardTimes, aes(x = Rewards), binwidth = 60, color = "grey", alpha = 0.7) +
+    geom_rug(data = rewardTimes, aes(x = Rewards)) +
+    xlim(c(0,21600))
+}

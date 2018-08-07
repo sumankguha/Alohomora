@@ -37,10 +37,9 @@ makeTmpFiles() # Parses individual subject/animal record into its separate file
 {
 	# 1. Generate array of start and end line numbers for each animal
 	# Generate line numbers where records start for individual animal --> Records for individual animals are separated by "Start Date:" and the last line of the whole file gives the end of the last record
-	tr -d '\r' < $fileName > tempFile
-	rm $fileName
-	mv tempFile $fileName
-	endLine=$(wc -l < $fileName)
+	tr -d '\r' < $fileName > $fileName.processed
+  fileName=$fileName.processed
+  endLine=$(wc -l < $fileName)
 	endLine=$(( $endLine + 1 )) # adding one to total line numbers because later the end is set as endLine - 1
 	lineNums=($(awk '/Start\ Date:/ {print FNR}' $fileName) $endLine)
 
@@ -61,6 +60,7 @@ makeTmpFiles() # Parses individual subject/animal record into its separate file
 		endLine=$(( $endLine - 1 ))
 		sed -n "${startLine}, ${endLine}p" $fileName > $tmpFile
 	done
+  rm $fileName
 }
 
 makeCSV() # Parse indivual .tmp file to CSV files
@@ -94,7 +94,6 @@ makeCSV() # Parse indivual .tmp file to CSV files
 	echo "Rewards" $rewards | tr -s ' ' '\n' > $outputFile
 	outputFile=$(echo $outputFileName\_incorrLever.csv)
 	echo "IncorrLever"$incorrLeverPress | tr -s ' ' '\n' > $outputFile
-
 }
 
 # 2. INPUT SECTION
@@ -131,3 +130,24 @@ do
 	outputFileName=$(echo $tmpFile | sed -e 's/.tmp/.csv/')
 	makeCSV
 done
+
+# 3. Arrange files into folders
+# -----------------------------
+
+# move .tmp files into ../_tmpFiles
+if [ ! -d "../_tmpFiles" ]
+then
+  mkdir ../_tmpFiles
+  mv *.tmp ../_tmpFiles
+else
+  mv *.tmp ../_tmpFiles
+fi
+
+# move .csv files into ../_csvFiles
+if [ ! -d "../_csvFiles" ]
+then
+  mkdir ../_csvFiles
+  mv *.csv ../_csvFiles
+else
+  mv *.csv ../_csvFiles
+fi
