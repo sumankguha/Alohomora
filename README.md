@@ -1,3 +1,3 @@
 # Index
-1. ./BashScripts/makeTmpFiles: breaks up MedPC-IV IVSA log files into individual animal files
-2. ./BashScripts/makeCSV: breaks up .tmp files into csv files for further analysis
+1. ./BashScripts/parseDayFile:  breaks up MedPC-IV IVSA log files into individual .tmp and .csv files
+2. ./RScripts/makeEventsPlot:    generates events plot from \*reward.csv file
