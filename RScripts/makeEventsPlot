@@ -27,7 +27,6 @@ GRAPH/PLOT DESCRIPTION
 # Add command line arguments
 # --------------------------
 p <- add_argument(p, "fileName", help="Name of .csv IVSA file", type="character") # primary argument(s)
-p <- add_argument(p, "--regimen", help="Type of IVSA regimen [Options = ShA, LgA]", type="character", default="ShA") # optional argument(s)
 
 # Parse command line arguments
 # ----------------------------
@@ -48,6 +47,7 @@ rewardsDataFile <- str_c(date, cohort, regimen, group, subject, "rewards.csv", s
 corrLeverDataFile <- str_c(date, cohort, regimen, group, subject, "corrLever.csv", sep = "_")
 incorrLeverDataFile <- str_c(date, cohort, regimen, group, subject, "incorrLever.csv", sep = "_")
 
+# ---------- debug section ----------
 #print(rewardsDataFile)
 #print(corrLeverDataFile)
 #print(incorrLeverDataFile)
@@ -56,23 +56,31 @@ rewardTimes <- read_csv(rewardsDataFile, col_type = cols())
 corrLeverTimes <- read_csv(corrLeverDataFile, col_type = cols())
 incorrLeverTimes <- read_csv(incorrLeverDataFile, col_type = cols())
 
-
+# ---------- debug section ----------
 #rewardTimes %>% print
 #corrLeverTimes %>% print
 #incorrLeverTimes %>% print
-plot_title <- str_c()
-if (regimen = "ShA") {
+
+plot_title <- str_c(subject, regimen, date, sep = " ")
+if (regimen == "1H") {
   eventsPlot <- ggplot() +
-    geom_histogram(data = corrLeverTimes, aes(x = CorrLever), binwidth = 60, color = "green", alpha = 0.5) +
-    geom_histogram(data = incorrLeverTimes, aes(x = IncorrLever), binwidth = 60, color = "red", alpha = 0.5) +
-    geom_histogram(data = rewardTimes, aes(x = Rewards), binwidth = 60, color = "grey", alpha = 0.7) +
+    ggtitle(plot_title) +
+    geom_histogram(data = corrLeverTimes, aes(x = CorrLever), binwidth = 60, color = "green", fill = "green", alpha = 0.5) +
+    geom_histogram(data = incorrLeverTimes, aes(x = IncorrLever), binwidth = 60, color = "red", fill = "red", alpha = 0.5) +
+    geom_histogram(data = rewardTimes, aes(x = Rewards), binwidth = 60, color = "grey", fill = "grey", alpha = 0.7) +
     geom_rug(data = rewardTimes, aes(x = Rewards)) +
     xlim(c(0,3600))
 } else {
   eventsPlot <- ggplot() +
-    geom_histogram(data = corrLeverTimes, aes(x = CorrLever), binwidth = 60, color = "green", alpha = 0.5) +
-    geom_histogram(data = incorrLeverTimes, aes(x = IncorrLever), binwidth = 60, color = "red", alpha = 0.5) +
-    geom_histogram(data = rewardTimes, aes(x = Rewards), binwidth = 60, color = "grey", alpha = 0.7) +
+    ggtitle(plot_title) +
+    geom_histogram(data = corrLeverTimes, aes(x = CorrLever), binwidth = 60, color = "green", fill = "green", alpha = 0.5) +
+    geom_histogram(data = incorrLeverTimes, aes(x = IncorrLever), binwidth = 60, color = "red", fill = "red", alpha = 0.5) +
+    geom_histogram(data = rewardTimes, aes(x = Rewards), binwidth = 60, color = "grey", fill = "grey", alpha = 0.7) +
     geom_rug(data = rewardTimes, aes(x = Rewards)) +
     xlim(c(0,21600))
 }
+
+plot_fileName <- str_c(subject, regimen, date, sep = "_")
+plot_fileName <- str_c("../_plots/", plot_fileName, ".pdf")
+if(!dir.exists("../_plots")) {dir.create("../_plots")}
+ggsave(plot_fileName, plot = eventsPlot, device = "pdf", width = 190, height = 95, units = "mm")
