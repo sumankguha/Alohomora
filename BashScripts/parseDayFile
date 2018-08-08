@@ -4,7 +4,7 @@
 # -----------------
 read -d '' usage << "BLOCK"
 DESCRIPTION:
-This script runs over a day-file and splits it into  '.tmp' file for individual animal for data integrity check. Finally it saves .csv files for rewards, correct lever presses, and incorrect lever presses. The file naming convention is <DATE>_<EXPERIMENT NAME>_<GROUP>_<SUBJECT>_rewards/corrLever/incorrLever.csv. The meta data is injected into file name for analytics purposes later.
+This script runs over a day-file and splits it into  '.tmp' file for individual animal for data integrity check. Finally it saves .csv files for rewards, correct lever presses, and incorrect lever presses. The file naming convention is <DATE>_<EXPERIMENT NAME>_<GROUP>_<SUBJECT>_rewards/corrLever/incorrLever.csv. The meta data is injected into file name for analytics purposes later. The files themselves are saved in a folder(s) named as ../_tmpFiles and ../_csvFiles for tmp and csv files respectively
 
 USAGE: parseDayFile -FLAG(S)/--LONG_NAME_OF_FLAG(S) <ARGUMENTS>
 
@@ -16,18 +16,20 @@ parseDayFile -f !2018-07-06
 parseDayFile --file !2018-07-06
 
 This generates ...
-2018-07-06_ICSS+IVSA_1H_FEMALES_BE20.tmp
-2018-07-06_ICSS+IVSA_1H_FEMALES_BE20_rewards.csv
-2018-07-06_ICSS+IVSA_1H_FEMALES_BEo20_corrLever.csv
-2018-07-06_ICSS+IVSA_1H_FEMALES_BE20_incorrLever.csv
- ... and similar for other animals
+../_tmpFiles/2018-07-06_ICSS+IVSA_1H_FEMALES_BE20.tmp
+../_csvFiles/2018-07-06_ICSS+IVSA_1H_FEMALES_BE20_rewards.csv
+../_csvFiles/2018-07-06_ICSS+IVSA_1H_FEMALES_BEo20_corrLever.csv
+../_csvFiles/2018-07-06_ICSS+IVSA_1H_FEMALES_BE20_incorrLever.csv
+
+... and similar for other animals
 
  CAVEAT:
- The data is stored in the folder where the script is evoked.
+ The script needs to be evoked in the _rigFiles directory.
 
-VERSION: 1.0 'BillionBunnies' (Because as of now it creates a billion files)
-RELEASE DATE: Sun July 22 2018
-AUTHOR: Suman Guha
+VERSION: 1.1 'BillionBunnies' (Because it creates a billion files)
+RELEASE DATE: Sun Aug 08 2018
+RELEASE NOTE: Files are now saved in a understandable directory structure
+AUTHOR: Suman Guha -- @sumankguha (github), @sug893 (code.harvard.edu)
 BLOCK
 
 # 1. FUNCTION SECTION

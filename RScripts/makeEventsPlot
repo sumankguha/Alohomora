@@ -16,12 +16,26 @@ p <- arg_parser(
   "SCRIPT DESCRIPTION:
   This script runs over a .csv file to generate a reward dispension events plot per epoch.
 
-GRAPH/PLOT DESCRIPTION
+GRAPH/PLOT DESCRIPTION:
   X-Axis (1): Time in seconds from 0 to 3600 (for ShA) or 21600 (for LgA)
   X-Axis (2): Rug plot showing individual reward times
   Y-Axis (1): 60 s binned frequency distribution histogram of rewards (grey bars)
   Y-Axis (2): 60 s binned frequency distribution histogram of correct lever press (green bars)
-  Y-Axis (3): 60 s binned frequency distribution histogram of incorrect lever press (red bars)"
+  Y-Axis (3): 60 s binned frequency distribution histogram of incorrect lever press (red bars)
+
+EXAMPLE:
+makeEventsPlot <enter file name here>
+
+This generates a plot that is saved as ...
+../_plots/<SubjectID>_<Regimen>_<DATE>.pdf
+
+CAVEAT: The script needs to be evoked in the _csvFiles directory and works on files generated using parseDayFile script
+
+VERSION: 1.0 'Plots Everywhere'
+RELEASE DATE: Sun Aug 08 2018
+RELEASE NOTE: Hello World!
+AUTHOR: Suman Guha -- @sumankguha (github), @sug893 (code.harvard.edu)
+"
 )
 
 # Add command line arguments
@@ -31,18 +45,18 @@ p <- add_argument(p, "fileName", help="Name of .csv IVSA file", type="character"
 # Parse command line arguments
 # ----------------------------
 argv <- parse_args(p)
-rewardFileName = argv$fileName
-regimen = argv$regimen
+rewardFileName = argv$fileName # parsing file name into variable
 
 # 1. MAIN FUNCTION
 # ----------------
-fileParts <- str_split(rewardFileName, "_")[[1]]
+fileParts <- str_split(rewardFileName, "_")[[1]] # split file name to generate metadata
 date <- fileParts[1]
 cohort <- fileParts[2]
 regimen <- fileParts[3]
 group <- fileParts[4]
 subject <- fileParts[5]
 
+# generating file names to read from. Redundancy for operator error
 rewardsDataFile <- str_c(date, cohort, regimen, group, subject, "rewards.csv", sep = "_")
 corrLeverDataFile <- str_c(date, cohort, regimen, group, subject, "corrLever.csv", sep = "_")
 incorrLeverDataFile <- str_c(date, cohort, regimen, group, subject, "incorrLever.csv", sep = "_")
@@ -52,6 +66,7 @@ incorrLeverDataFile <- str_c(date, cohort, regimen, group, subject, "incorrLever
 #print(corrLeverDataFile)
 #print(incorrLeverDataFile)
 
+# Read data in
 rewardTimes <- read_csv(rewardsDataFile, col_type = cols())
 corrLeverTimes <- read_csv(corrLeverDataFile, col_type = cols())
 incorrLeverTimes <- read_csv(incorrLeverDataFile, col_type = cols())
@@ -61,7 +76,9 @@ incorrLeverTimes <- read_csv(incorrLeverDataFile, col_type = cols())
 #corrLeverTimes %>% print
 #incorrLeverTimes %>% print
 
-plot_title <- str_c(subject, regimen, date, sep = " ")
+plot_title <- str_c(subject, regimen, date, sep = " ") # generate plot title
+
+# set x-axis according to whether it is a ShA/LgA regimen and then plot
 if (regimen == "1H") {
   eventsPlot <- ggplot() +
     ggtitle(plot_title) +
@@ -80,7 +97,12 @@ if (regimen == "1H") {
     xlim(c(0,21600))
 }
 
+# dynamically set output file name for plot as <subjectID>_<regimen>_<date> and then prefix with "../_plots/" and suffix with ".pdf"
 plot_fileName <- str_c(subject, regimen, date, sep = "_")
 plot_fileName <- str_c("../_plots/", plot_fileName, ".pdf")
+
+# check if ../_plots directory exists or not. If not create it
 if(!dir.exists("../_plots")) {dir.create("../_plots")}
+
+# save plot with specific dimensions
 ggsave(plot_fileName, plot = eventsPlot, device = "pdf", width = 190, height = 95, units = "mm")
