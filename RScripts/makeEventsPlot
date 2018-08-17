@@ -41,7 +41,7 @@ AUTHOR: Suman Guha -- @sumankguha (github), @sug893 (code.harvard.edu)
 # Add command line arguments
 # --------------------------
 p <- add_argument(p, "fileName", help="Name of .csv IVSA file", type="character") # primary argument(s)
-p <- add_argument(p, "", help=" [ ]", type="character", default=" ") # optional argument(s)
+p <- add_argument(p, "--yAxisLimit", help="upper limit of y-axis", type="numeric", default=50) # optional argument(s)
 
 # Parse command line arguments
 # ----------------------------
@@ -87,28 +87,31 @@ plot_title <- str_c(subject, regimen, date, sep = " ") # generate plot title
 # set x-axis according to whether it is a ShA/LgA regimen and then plot
 if (regimen == "1H") {
   eventsPlot <- ggplot() +
-    ggtitle(plot_title) +
+    ggtitle(plot_title) + theme_minimal() +
     geom_histogram(data = corrLeverTimes, aes(x = CorrLever), binwidth = 60, color = "green", fill = "green", alpha = 0.5) +
     geom_histogram(data = incorrLeverTimes, aes(x = IncorrLever), binwidth = 60, color = "red", fill = "red", alpha = 0.5) +
     geom_histogram(data = rewardTimes, aes(x = Rewards), binwidth = 60, color = "grey", fill = "grey", alpha = 0.7) +
     geom_rug(data = rewardTimes, aes(x = Rewards)) +
-    xlim(c(0,3600)) + xlab("Time (s)") + ylab("Event Frequency")
+    xlim(c(0,3600)) + ylim(c(0, yAxisLimit)) +
+    xlab("Time (s)") + ylab("Event Frequency")
 } else if (regimen == "6H") {
   eventsPlot <- ggplot() +
-    ggtitle(plot_title) +
+    ggtitle(plot_title) + theme_minimal() +
     geom_histogram(data = corrLeverTimes, aes(x = CorrLever), binwidth = 60, color = "green", fill = "green", alpha = 0.5) +
     geom_histogram(data = incorrLeverTimes, aes(x = IncorrLever), binwidth = 60, color = "red", fill = "red", alpha = 0.5) +
     geom_histogram(data = rewardTimes, aes(x = Rewards), binwidth = 60, color = "grey", fill = "grey", alpha = 0.7) +
     geom_rug(data = rewardTimes, aes(x = Rewards)) +
-    xlim(c(0,21600)) + xlab("Time (s)") + ylab("Event Frequency")
+    xlim(c(0,21600)) + ylim(c(0, yAxisLimit)) +
+    xlab("Time (s)") + ylab("Event Frequency")
 } else if (regimen == "3H") {
   eventsPlot <- ggplot() +
-    ggtitle(plot_title) +
+    ggtitle(plot_title) + theme_minimal() +
     geom_histogram(data = corrLeverTimes, aes(x = CorrLever), binwidth = 60, color = "green", fill = "green", alpha = 0.5) +
     geom_histogram(data = incorrLeverTimes, aes(x = IncorrLever), binwidth = 60, color = "red", fill = "red", alpha = 0.5) +
     geom_histogram(data = rewardTimes, aes(x = Rewards), binwidth = 60, color = "grey", fill = "grey", alpha = 0.7) +
     geom_rug(data = rewardTimes, aes(x = Rewards)) +
-    xlim(c(0,10800)) + xlab("Time (s)") + ylab("Event Frequency")
+    xlim(c(0,10800)) + ylim(c(0, yAxisLimit)) +
+    xlab("Time (s)") + ylab("Event Frequency")
 }
 
 # dynamically set output file name for plot as <subjectID>_<regimen>_<date> and then prefix with "../_plots/" and suffix with ".pdf"
