@@ -58,7 +58,8 @@ regimen <- fileParts[3]
 group <- fileParts[4]
 subject <- fileParts[5]
 
-# generating file names to read from. Redundancy for operator error
+# 1.1. generating file names to read from. Redundancy for operator error
+# ----------------------------------------------------------------------
 rewardsDataFile <- str_c(date, cohort, regimen, group, subject, "rewards.csv", sep = "_")
 corrLeverDataFile <- str_c(date, cohort, regimen, group, subject, "corrLever.csv", sep = "_")
 incorrLeverDataFile <- str_c(date, cohort, regimen, group, subject, "incorrLever.csv", sep = "_")
@@ -68,7 +69,8 @@ incorrLeverDataFile <- str_c(date, cohort, regimen, group, subject, "incorrLever
 #print(corrLeverDataFile)
 #print(incorrLeverDataFile)
 
-# Read data in
+# 1.2 Read data in
+# ----------------
 rewardTimes <- read_csv(rewardsDataFile, col_type = cols())
 corrLeverTimes <- read_csv(corrLeverDataFile, col_type = cols())
 incorrLeverTimes <- read_csv(incorrLeverDataFile, col_type = cols())
@@ -78,6 +80,8 @@ incorrLeverTimes <- read_csv(incorrLeverDataFile, col_type = cols())
 #corrLeverTimes %>% print
 #incorrLeverTimes %>% print
 
+# 2. GENERATE PLOT
+# ------------------
 plot_title <- str_c(subject, regimen, date, sep = " ") # generate plot title
 
 # set x-axis according to whether it is a ShA/LgA regimen and then plot
