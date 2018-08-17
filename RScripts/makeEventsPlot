@@ -41,11 +41,13 @@ AUTHOR: Suman Guha -- @sumankguha (github), @sug893 (code.harvard.edu)
 # Add command line arguments
 # --------------------------
 p <- add_argument(p, "fileName", help="Name of .csv IVSA file", type="character") # primary argument(s)
+p <- add_argument(p, "", help=" [ ]", type="character", default=" ") # optional argument(s)
 
 # Parse command line arguments
 # ----------------------------
 argv <- parse_args(p)
 rewardFileName = argv$fileName # parsing file name into variable
+yAxisLimit = argv$yAxisLimit # parsing y-axis limit from variable
 
 # 1. MAIN FUNCTION
 # ----------------
@@ -87,7 +89,7 @@ if (regimen == "1H") {
     geom_histogram(data = rewardTimes, aes(x = Rewards), binwidth = 60, color = "grey", fill = "grey", alpha = 0.7) +
     geom_rug(data = rewardTimes, aes(x = Rewards)) +
     xlim(c(0,3600)) + xlab("Time (s)") + ylab("Event Frequency")
-} else {
+} else if (regimen == "6H") {
   eventsPlot <- ggplot() +
     ggtitle(plot_title) +
     geom_histogram(data = corrLeverTimes, aes(x = CorrLever), binwidth = 60, color = "green", fill = "green", alpha = 0.5) +
@@ -95,6 +97,14 @@ if (regimen == "1H") {
     geom_histogram(data = rewardTimes, aes(x = Rewards), binwidth = 60, color = "grey", fill = "grey", alpha = 0.7) +
     geom_rug(data = rewardTimes, aes(x = Rewards)) +
     xlim(c(0,21600)) + xlab("Time (s)") + ylab("Event Frequency")
+} else if (regimen == "3H") {
+  eventsPlot <- ggplot() +
+    ggtitle(plot_title) +
+    geom_histogram(data = corrLeverTimes, aes(x = CorrLever), binwidth = 60, color = "green", fill = "green", alpha = 0.5) +
+    geom_histogram(data = incorrLeverTimes, aes(x = IncorrLever), binwidth = 60, color = "red", fill = "red", alpha = 0.5) +
+    geom_histogram(data = rewardTimes, aes(x = Rewards), binwidth = 60, color = "grey", fill = "grey", alpha = 0.7) +
+    geom_rug(data = rewardTimes, aes(x = Rewards)) +
+    xlim(c(0,10800)) + xlab("Time (s)") + ylab("Event Frequency")
 }
 
 # dynamically set output file name for plot as <subjectID>_<regimen>_<date> and then prefix with "../_plots/" and suffix with ".pdf"
