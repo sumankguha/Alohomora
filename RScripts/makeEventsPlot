@@ -17,7 +17,7 @@ p <- arg_parser(
   This script runs over a .csv file to generate a reward dispension events plot per epoch.
 
 GRAPH/PLOT DESCRIPTION:
-  X-Axis (1): Time in seconds from 0 to 3600 (for ShA) or 21600 (for LgA)
+  X-Axis (1): Time in seconds from 0 to 3600 (for ShA), 21600 (for LgA), or
   X-Axis (2): Rug plot showing individual reward times
   Y-Axis (1): 60 s binned frequency distribution histogram of rewards (grey bars)
   Y-Axis (2): 60 s binned frequency distribution histogram of correct lever press (green bars)
@@ -31,17 +31,21 @@ This generates a plot that is saved as ...
 
 CAVEAT: The script needs to be evoked in the _csvFiles directory and works on files generated using parseDayFile script
 
-VERSION: 1.0 'Plots Everywhere'
+VERSION: 1.1 'Plots Everywhere'
 RELEASE DATE: Sun Aug 08 2018
-RELEASE NOTE: Hello World!
+RELEASE NOTE: Added options to adjust y-axis limit and histogram bin widths
 AUTHOR: Suman Guha -- @sumankguha (github), @sug893 (code.harvard.edu)
 "
 )
 
 # Add command line arguments
 # --------------------------
-p <- add_argument(p, "fileName", help="Name of .csv IVSA file", type="character") # primary argument(s)
-p <- add_argument(p, "--yAxisLimit", help="upper limit of y-axis", type="numeric", default=50) # optional argument(s)
+# primary argument(s)
+p <- add_argument(p, "fileName", help="Name of .csv IVSA file", type="character")
+# optional argument(s)
+p <- add_argument(p, "--yAxisLimit", help="upper limit of y-axis", type="numeric", default=50)
+p <- add_argument(p, "--binWidth", help="bin width for frequency distribution histograms", type="numeric", default=60)
+p <- add_argument(p, "--fileSuffix", help="suffix to file name", type="character", default="")
 
 # Parse command line arguments
 # ----------------------------
@@ -88,34 +92,37 @@ plot_title <- str_c(subject, regimen, date, sep = " ") # generate plot title
 if (regimen == "1H") {
   eventsPlot <- ggplot() +
     ggtitle(plot_title) + theme_minimal() +
-    geom_histogram(data = corrLeverTimes, aes(x = CorrLever), binwidth = 60, color = "green", fill = "green", alpha = 0.5) +
-    geom_histogram(data = incorrLeverTimes, aes(x = IncorrLever), binwidth = 60, color = "red", fill = "red", alpha = 0.5) +
-    geom_histogram(data = rewardTimes, aes(x = Rewards), binwidth = 60, color = "grey", fill = "grey", alpha = 0.7) +
+    geom_histogram(data = corrLeverTimes, aes(x = CorrLever), binwidth = binWidth, color = "green", fill = "green", alpha = 0.5) +
+    geom_histogram(data = incorrLeverTimes, aes(x = IncorrLever), binwidth = binWidth, color = "red", fill = "red", alpha = 0.5) +
+    geom_histogram(data = rewardTimes, aes(x = Rewards), binwidth = binWidth, color = "grey", fill = "grey", alpha = 0.7) +
     geom_rug(data = rewardTimes, aes(x = Rewards)) +
     xlim(c(0,3600)) + ylim(c(0, yAxisLimit)) +
     xlab("Time (s)") + ylab("Event Frequency")
 } else if (regimen == "6H") {
   eventsPlot <- ggplot() +
     ggtitle(plot_title) + theme_minimal() +
-    geom_histogram(data = corrLeverTimes, aes(x = CorrLever), binwidth = 60, color = "green", fill = "green", alpha = 0.5) +
-    geom_histogram(data = incorrLeverTimes, aes(x = IncorrLever), binwidth = 60, color = "red", fill = "red", alpha = 0.5) +
-    geom_histogram(data = rewardTimes, aes(x = Rewards), binwidth = 60, color = "grey", fill = "grey", alpha = 0.7) +
+    geom_histogram(data = corrLeverTimes, aes(x = CorrLever), binwidth = binWidth, color = "green", fill = "green", alpha = 0.5) +
+    geom_histogram(data = incorrLeverTimes, aes(x = IncorrLever), binwidth = binWidth, color = "red", fill = "red", alpha = 0.5) +
+    geom_histogram(data = rewardTimes, aes(x = Rewards), binwidth = binWidth, color = "grey", fill = "grey", alpha = 0.7) +
     geom_rug(data = rewardTimes, aes(x = Rewards)) +
     xlim(c(0,21600)) + ylim(c(0, yAxisLimit)) +
     xlab("Time (s)") + ylab("Event Frequency")
 } else if (regimen == "3H") {
   eventsPlot <- ggplot() +
     ggtitle(plot_title) + theme_minimal() +
-    geom_histogram(data = corrLeverTimes, aes(x = CorrLever), binwidth = 60, color = "green", fill = "green", alpha = 0.5) +
-    geom_histogram(data = incorrLeverTimes, aes(x = IncorrLever), binwidth = 60, color = "red", fill = "red", alpha = 0.5) +
-    geom_histogram(data = rewardTimes, aes(x = Rewards), binwidth = 60, color = "grey", fill = "grey", alpha = 0.7) +
+    geom_histogram(data = corrLeverTimes, aes(x = CorrLever), binwidth = binWidth, color = "green", fill = "green", alpha = 0.5) +
+    geom_histogram(data = incorrLeverTimes, aes(x = IncorrLever), binwidth = binWidth, color = "red", fill = "red", alpha = 0.5) +
+    geom_histogram(data = rewardTimes, aes(x = Rewards), binwidth = binWidth, color = "grey", fill = "grey", alpha = 0.7) +
     geom_rug(data = rewardTimes, aes(x = Rewards)) +
     xlim(c(0,10800)) + ylim(c(0, yAxisLimit)) +
     xlab("Time (s)") + ylab("Event Frequency")
 }
 
-# dynamically set output file name for plot as <subjectID>_<regimen>_<date> and then prefix with "../_plots/" and suffix with ".pdf"
+# dynamically set output file name for plot as <subjectID>_<regimen>_<date>, (optional) file suffix; then prefix with "../_plots/" and suffix with ".pdf"
 plot_fileName <- str_c(subject, regimen, date, sep = "_")
+if(fileSuffix != "") {
+  plot_fileName <- str_c(plot_fileName, fileSuffix, sep = "_")
+}
 plot_fileName <- str_c("../_plots/", plot_fileName, ".pdf")
 
 # check if ../_plots directory exists or not. If not create it
