@@ -91,11 +91,11 @@ makeCSV() # Parse indivual .tmp file to CSV files
 
 	# Saving data to file
 	outputFile=$(echo $outputFileName\_corrLever.csv)
-	echo "CorrLever" $corrLeverPress | tr -s ' ' '\n' > $outputFile
+	echo "eventTime" $corrLeverPress | tr -s ' ' '\n' > $outputFile
 	outputFile=$(echo $outputFileName\_rewards.csv)
-	echo "Rewards" $rewards | tr -s ' ' '\n' > $outputFile
+	echo "eventTime" $rewards | tr -s ' ' '\n' > $outputFile
 	outputFile=$(echo $outputFileName\_incorrLever.csv)
-	echo "IncorrLever"$incorrLeverPress | tr -s ' ' '\n' > $outputFile
+	echo "eventTime" $incorrLeverPress | tr -s ' ' '\n' > $outputFile
 }
 
 # 2. INPUT SECTION
