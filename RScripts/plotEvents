@@ -12,7 +12,7 @@ library(ggplot2, quietly = TRUE)
 
 # Creating a parser
 # -----------------
-p <- arg_parser(
+p <- argparser::arg_parser(
   "SCRIPT DESCRIPTION:
   This script runs over a .csv file to generate a reward dispension events plot per epoch.
 
@@ -41,7 +41,7 @@ AUTHOR: Suman Guha -- @sumankguha (github), @sug893 (code.harvard.edu)
 # Add command line arguments
 # --------------------------
 # primary argument(s)
-p <- add_argument(p, "fileName", help="Name of .csv IVSA file", type="character")
+p <- argparser::add_argument(p, "fileName", help="Name of .csv IVSA file", type="character")
 # optional argument(s)
 p <- add_argument(p, "--yAxisLimit", help="upper limit of y-axis", type="numeric", default=50)
 p <- add_argument(p, "--binWidth", help="bin width for frequency distribution histograms", type="numeric", default=60)
@@ -123,7 +123,7 @@ plot_fileName <- str_c(subject, regimen, date, sep = "_")
 if(fileSuffix != "") {
   plot_fileName <- str_c(plot_fileName, fileSuffix, sep = "_")
 }
-plot_fileName <- str_c("../_plots/", plot_fileName, ".pdf")
+plot_fileName <- str_c("../_plots/", plot_fileName, "_individualEventsPlot.pdf")
 
 # check if ../_plots directory exists or not. If not create it
 if(!dir.exists("../_plots")) {dir.create("../_plots")}
