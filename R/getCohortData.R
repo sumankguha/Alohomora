@@ -30,5 +30,11 @@ cohortData <- function(pathToFiles, fileType, cohortInfo) {
     str_replace(".csv", "")
   outputTbl$date <- as.Date(outputTbl$date)
   outputTbl$startDate <- as.Date(outputTbl$startDate)
+  outputTbl$experiment <- as.factor(outputTbl$experiment)
+  outputTbl$regimen <- as.factor(outputTbl$regimen)
+  outputTbl$group <- as.factor(outputTbl$group)
+  outputTbl$subjectID <- as.factor(outputTbl$subjectID)
+  outputTbl$eventType <- as.factor(outputTbl$eventType)
+  outputTbl$cohortInfo <- as.factor(outputTbl$cohortInfo)
   return(outputTbl)
 }
