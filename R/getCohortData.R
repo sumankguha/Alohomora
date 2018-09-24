@@ -1,3 +1,7 @@
+#'  Gather a particular data type (correct lever press, incorrect lever press, reward dispension) for an experimental group
+#'
+#'  \code{getCohortData} uses stringr, readr, tibble, and tidyr to collate the data from all days of an experiment
+
 cohortData <- function(pathToFiles, fileType, cohortInfo) {
   filePattern <- stringr::str_c("_", fileType, ".csv")
   fileList <- list.files(path = pathToFiles, pattern = filePattern)
@@ -23,11 +27,11 @@ cohortData <- function(pathToFiles, fileType, cohortInfo) {
 
   outputTbl <- outputTbl %>% tibble::add_column(cohortInfo)
   outputTbl$startDate <- outputTbl$startDate %>%
-    str_replace("_.*", "")
+    stringr::str_replace("_.*", "")
   outputTbl <- outputTbl %>%
-    separate(metaData, c("date", "experiment", "regimen", "group", "subjectID", "eventType"), sep = "_")
+    tidyr::separate(metaData, c("date", "experiment", "regimen", "group", "subjectID", "eventType"), sep = "_")
   outputTbl$eventType <- outputTbl$eventType %>%
-    str_replace(".csv", "")
+    stringr::str_replace(".csv", "")
   outputTbl$date <- as.Date(outputTbl$date)
   outputTbl$startDate <- as.Date(outputTbl$startDate)
   outputTbl$experiment <- as.factor(outputTbl$experiment)
