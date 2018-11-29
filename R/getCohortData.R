@@ -1,6 +1,20 @@
-#'  Gather a particular data type (correct lever press, incorrect lever press, reward dispension) for an experimental group
+#'  A tibble of event(s)
 #'
-#'  \code{getCohortData} uses stringr, readr, tibble, and tidyr to collate the data from all days of an experiment
+#'  Creates a tibble of a specified event type from all animals, across all days of the experiment
+#'
+#'  @param pathToFiles relative/full path to folder where experiment (.csv) files are stored
+#'  @param fileType event type that will be retrieved
+#'  @param cohortInfo metadata to indicate the cohort
+#'
+#'  @return A tibble containing
+#'
+#'  @examples
+#'
+#'
+#'  @author Suman Guha, \email{suman7285@gmail.com}
+#'  @keywords utilities
+#'
+#'  @export
 
 cohortData <- function(pathToFiles, fileType, cohortInfo) {
   filePattern <- stringr::str_c("_", fileType, ".csv")
