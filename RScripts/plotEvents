@@ -1,4 +1,4 @@
-#! /usr/bin/env Rscript
+#! /usr/bin/env RScript
 
 # 0. HELPER AND INPUT SECTION
 # ---------------------------
@@ -24,12 +24,13 @@ GRAPH/PLOT DESCRIPTION:
   Y-Axis (3): 60 s binned frequency distribution histogram of incorrect lever press (red bars)
 
 EXAMPLE:
-makeEventsPlot <enter file name here>
+plotEvents <enter file name here>
 
 This generates a plot that is saved as ...
 ../_plots/<SubjectID>_<Regimen>_<DATE>.pdf
 
 CAVEAT: The script needs to be evoked in the _csvFiles directory and works on files generated using parseDayFile script
+        The script generates the filenames for various events automatically, so if you're batch processing and automating file handling make sure you pass in files of only one event type
 
 VERSION: 1.1 'Plots Everywhere'
 RELEASE DATE: Sun Aug 08 2018
