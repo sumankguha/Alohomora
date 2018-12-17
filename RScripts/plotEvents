@@ -44,15 +44,17 @@ AUTHOR: Suman Guha -- @sumankguha (github), @sug893 (code.harvard.edu)
 # primary argument(s)
 p <- argparser::add_argument(p, "fileName", help="Name of .csv IVSA file", type="character")
 # optional argument(s)
-p <- add_argument(p, "--yAxisLimit", help="upper limit of y-axis", type="numeric", default=50)
-p <- add_argument(p, "--binWidth", help="bin width for frequency distribution histograms", type="numeric", default=60)
-p <- add_argument(p, "--fileSuffix", help="suffix to file name", type="character", default="")
+p <- argparser::add_argument(p, "--yAxisLimit", help="upper limit of y-axis", type="numeric", default=50)
+p <- argparser::add_argument(p, "--binWidth", help="bin width for frequency distribution histograms", type="numeric", default=60)
+p <- argparser::add_argument(p, "--fileSuffix", help="suffix to file name", type="character", default="")
 
 # Parse command line arguments
 # ----------------------------
 argv <- parse_args(p)
-rewardFileName = argv$fileName # parsing file name into variable
-yAxisLimit = argv$yAxisLimit # parsing y-axis limit from variable
+rewardFileName = argv$fileName  # parsing file name into variable
+yAxisLimit = argv$yAxisLimit    # parsing y-axis limit from variable
+binWidth = argv$binWidth        # parsing binwidth from variable
+fileSuffix = argv$fileSuffix    # parsing binwidth from variable
 
 # 1. MAIN FUNCTION
 # ----------------
@@ -93,28 +95,28 @@ plot_title <- str_c(subject, regimen, date, sep = " ") # generate plot title
 if (regimen == "1H") {
   eventsPlot <- ggplot() +
     ggtitle(plot_title) + theme_minimal() +
-    geom_histogram(data = corrLeverTimes, aes(x = CorrLever), binwidth = binWidth, color = "green", fill = "green", alpha = 0.5) +
-    geom_histogram(data = incorrLeverTimes, aes(x = IncorrLever), binwidth = binWidth, color = "red", fill = "red", alpha = 0.5) +
-    geom_histogram(data = rewardTimes, aes(x = Rewards), binwidth = binWidth, color = "grey", fill = "grey", alpha = 0.7) +
-    geom_rug(data = rewardTimes, aes(x = Rewards)) +
+    geom_histogram(data = corrLeverTimes, aes(x = eventTime), binwidth = binWidth, color = "green", fill = "green", alpha = 0.5) +
+    geom_histogram(data = incorrLeverTimes, aes(x = eventTime), binwidth = binWidth, color = "red", fill = "red", alpha = 0.5) +
+    geom_histogram(data = rewardTimes, aes(x = eventTime), binwidth = binWidth, color = "grey", fill = "grey", alpha = 0.7) +
+    geom_rug(data = rewardTimes, aes(x = eventTime)) +
     xlim(c(0,3600)) + ylim(c(0, yAxisLimit)) +
     xlab("Time (s)") + ylab("Event Frequency")
 } else if (regimen == "6H") {
   eventsPlot <- ggplot() +
     ggtitle(plot_title) + theme_minimal() +
-    geom_histogram(data = corrLeverTimes, aes(x = CorrLever), binwidth = binWidth, color = "green", fill = "green", alpha = 0.5) +
-    geom_histogram(data = incorrLeverTimes, aes(x = IncorrLever), binwidth = binWidth, color = "red", fill = "red", alpha = 0.5) +
-    geom_histogram(data = rewardTimes, aes(x = Rewards), binwidth = binWidth, color = "grey", fill = "grey", alpha = 0.7) +
-    geom_rug(data = rewardTimes, aes(x = Rewards)) +
+    geom_histogram(data = corrLeverTimes, aes(x = eventTime), binwidth = binWidth, color = "green", fill = "green", alpha = 0.5) +
+    geom_histogram(data = incorrLeverTimes, aes(x = eventTime), binwidth = binWidth, color = "red", fill = "red", alpha = 0.5) +
+    geom_histogram(data = rewardTimes, aes(x = eventTime), binwidth = binWidth, color = "grey", fill = "grey", alpha = 0.7) +
+    geom_rug(data = rewardTimes, aes(x = eventTime)) +
     xlim(c(0,21600)) + ylim(c(0, yAxisLimit)) +
     xlab("Time (s)") + ylab("Event Frequency")
 } else if (regimen == "3H") {
   eventsPlot <- ggplot() +
     ggtitle(plot_title) + theme_minimal() +
-    geom_histogram(data = corrLeverTimes, aes(x = CorrLever), binwidth = binWidth, color = "green", fill = "green", alpha = 0.5) +
-    geom_histogram(data = incorrLeverTimes, aes(x = IncorrLever), binwidth = binWidth, color = "red", fill = "red", alpha = 0.5) +
-    geom_histogram(data = rewardTimes, aes(x = Rewards), binwidth = binWidth, color = "grey", fill = "grey", alpha = 0.7) +
-    geom_rug(data = rewardTimes, aes(x = Rewards)) +
+    geom_histogram(data = corrLeverTimes, aes(x = eventTime), binwidth = binWidth, color = "green", fill = "green", alpha = 0.5) +
+    geom_histogram(data = incorrLeverTimes, aes(x = eventTime), binwidth = binWidth, color = "red", fill = "red", alpha = 0.5) +
+    geom_histogram(data = rewardTimes, aes(x = eventTime), binwidth = binWidth, color = "grey", fill = "grey", alpha = 0.7) +
+    geom_rug(data = rewardTimes, aes(x = eventTime)) +
     xlim(c(0,10800)) + ylim(c(0, yAxisLimit)) +
     xlab("Time (s)") + ylab("Event Frequency")
 }
