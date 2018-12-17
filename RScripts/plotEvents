@@ -1,4 +1,4 @@
-#! /usr/bin/env RScript
+#! /usr/bin/env Rscript
 
 # 0. HELPER AND INPUT SECTION
 # ---------------------------
