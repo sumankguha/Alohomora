@@ -40,6 +40,15 @@ done
 # 3. MAIN SECTION
 # ---------------
 
+case $switch in
+	"ICSS")
+		
+		;;
+	"IVSA")
+		;;
+esac
+
+
 2820  cat ANA_2018-09-04_SG8.CSV
  2821  awk -f  ANA_2018-09-04_SG8.CSV
  2822  awk 'BEGIN {FS=","} {print $0}' ANA_2018-09-04_SG8.CSV
