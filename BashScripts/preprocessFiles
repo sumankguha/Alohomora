@@ -4,7 +4,7 @@
 # -----------------
 read -d '' usage << "BLOCK"
 DESCRIPTION:
-USAGE: preprocessICSSFiles -FLAG(S)/--LONG_NAME_OF_FLAG(S) <ARGUMENTS>
+USAGE: preprocessFiles -FLAG(S)/--LONG_NAME_OF_FLAG(S) <ARGUMENTS>
 INPUT FLAGS:
 EXAMPLE:
 CAVEAT:
@@ -24,6 +24,7 @@ for opt in $@; do
 	case $opt in
 		--help) 	set -- $@ -h;;
 		--file)		set -- $@ -f;;
+		--behavior) set -- $@ -b;;
 		*)		set -- $@ $opt;;
 	esac
 done
@@ -32,6 +33,7 @@ while getopts "hf:" opt; do
 	case $opt in
 		h) echo "$usage"; exit 0;;
 		f) fileName=$OPTARG;;
+		b) switch=$OPTARG;;
 	esac
 done
 
