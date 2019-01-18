@@ -1,0 +1,189 @@
+#! /usr/bin/env bash
+
+# 0. HELPER SECTION
+# -----------------
+read -d '' usage << "BLOCK"
+DESCRIPTION:
+USAGE: preprocessICSSFiles -FLAG(S)/--LONG_NAME_OF_FLAG(S) <ARGUMENTS>
+INPUT FLAGS:
+EXAMPLE:
+CAVEAT:
+VERSION:
+RELEASE DATE:
+AUTHOR: Suman Guha
+BLOCK
+
+# 1. FUNCTION SECTION
+# -------------------
+
+# 2. INPUT SECTION
+# ----------------
+# Converting flags from long form to short form
+for opt in $@; do
+	shift
+	case $opt in
+		--help) 	set -- $@ -h;;
+		--file)		set -- $@ -f;;
+		*)		set -- $@ $opt;;
+	esac
+done
+# Setting parameters according to flags
+while getopts "hf:" opt; do
+	case $opt in
+		h) echo "$usage"; exit 0;;
+		f) fileName=$OPTARG;;
+	esac
+done
+
+# 3. MAIN SECTION
+# ---------------
+
+2820  cat ANA_2018-09-04_SG8.CSV
+ 2821  awk -f  ANA_2018-09-04_SG8.CSV
+ 2822  awk 'BEGIN {FS=","} {print $0}' ANA_2018-09-04_SG8.CSV
+ 2823  awk 'BEGIN {FS=","} {print $0}' ANA_2018-09-04_SG8.CSV | grep M50
+ 2824  grep M50 ANA_2018-09-04_SG8.CSV
+ 2825  grep M50, ANA_2018-09-04_SG8.CSV
+ 2826  cat ANA_2018-09-04_SG8.CSV | grep M50
+ 2827  cat ANA_2018-09-04_SG8.CSV | grep M50 | awk 'print $2, $3, $4, $5'
+ 2828  cat ANA_2018-09-04_SG8.CSV | grep M50 | awk '{print $2, $3, $4, $5}'
+ 2829  cat ANA_2018-09-04_SG8.CSV | grep M50, | awk '{print $2, $3, $4, $5}'
+ 2830  cat ANA_2018-09-04_SG8.CSV | grep M50,
+ 2831  cat ANA_2018-09-04_SG8.CSV | grep M50, | awk 'BEGIN {RS=","} {print $2, $3, $4, $5}'
+ 2832  cat ANA_2018-09-04_SG8.CSV | grep M50, | awk 'BEGIN {RS=","} {print $0}'
+ 2833  cat ANA_2018-09-04_SG8.CSV | grep M50, | awk 'BEGIN {FS=","} {print $0}'
+ 2834  cat ANA_2018-09-04_SG8.CSV | grep M50, | awk 'BEGIN {FS=","} {print $2, $3, $4, $5}'
+ 2835  grep M50, -A 1 ANA_2018-09-04_SG8.CSV
+ 2836  grep Data_File -A 1 ANA_2018-09-04_SG8.CSV
+ 2837  grep Data_File -A 1 ANA_2018-09-04_SG8.CSV | sed -n '1!p'
+ 2838  grep Data_File -A 1 ANA_2018-09-04_SG8.CSV | sed -n '1!p' | awk 'BEGIN {FS=","} {print $0}'
+ 2839  grep Data_File -A 1 ANA_2018-09-04_SG8.CSV | sed -n '1!p' | awk 'BEGIN {FS=","} {print $3 $4 $6}'
+ 2840  file="ANA_2018-09-04_SG8.CSV"
+ 2841  echo $file
+ 2842  cat $file | grep M50, | awk 'BEGIN {FS=","} {print $0}'
+ 2843  cat $file | grep M50, | awk 'BEGIN {RS=","} {print $0}' | sed 's/M50//'
+ 2844  cat $file | grep M50, | awk 'BEGIN {RS=","} {print $0}' | sed 's/M50,//'
+ 2845  cat $file | grep M50, | awk 'BEGIN {FS=","} {print $0}' | sed 's/M50,//'
+ 2846  cat $file | grep M50, | awk 'BEGIN {FS=","} {print $0}' | sed 's/M50,//' | awk 'BEGIN {FS=","} {print FNR}
+'
+ 2847  cat $file | grep M50, | awk 'BEGIN {FS=","} {print $0}' | sed 's/M50,//' | awk 'BEGIN {FS=","} {print FNR}'
+ 2848  cat $file | grep M50, | awk 'BEGIN {FS=","} {print $0}' | sed 's/M50,//' | awk 'BEGIN {FS=","} {print RNR}'
+ 2849  cat $file | grep M50, | awk 'BEGIN {FS=","} {print $0}' | sed 's/M50,//' | awk 'BEGIN {FS=","} {print NR}'
+ 2850  cat $file | grep M50, | awk 'BEGIN {FS=","} {print $0}' | sed 's/M50,//' | awk 'BEGIN {FS=","} END{print NR}'
+ 2851  cat $file | grep M50, | awk 'BEGIN {FS=","} {print $0}' | sed 's/M50,//' | awk 'END{print NR}'
+ 2852  cat $file | grep M50, | awk 'BEGIN {FS=","} {print $0}' | sed 's/M50,//' | sed 's/,/ /' | awk 'END{print NR}'
+ 2853  cat $file | grep M50, | awk 'BEGIN {FS=","} {print $0}' | sed 's/M50,//' | sed 's/,/ /'
+ 2854  cat $file | grep M50, | awk 'BEGIN {FS=","} {print $0}' | sed 's/M50,//' | sed 's/,/ /g'
+ 2855  cat $file | grep M50, | awk 'BEGIN {FS=","} {print $0}' | sed 's/M50,//' | sed 's/,/ /g' | awk 'END{print FNR}'
+ 2856  cat $file | grep M50, | awk 'BEGIN {FS=","} {print $0}' | sed 's/M50,//' | sed 's/,/ /g' | awk 'END{print NR}'
+ 2857  cat $file | grep M50, | awk 'BEGIN {FS=","} {print $0}' | sed 's/M50,//' | sed 's/,/ /g' | awk 'END{print NF}'
+ 2858  cat $file | grep M50, | awk 'BEGIN {FS=","} {print $0}' | sed 's/M50,//' | awk 'BEGIN {FS=","} END{print NF}'
+ 2859  pwd
+ 2860  ls
+ 2861  ls -alh
+ 2862  cat $file | grep M50, | awk 'BEGIN {RS=","} {print $0}'
+ 2863  cat $file | grep T0, | awk 'BEGIN {RS=","} {print $0}'
+ 2864  cat $file | grep MaxR, | awk 'BEGIN {RS=","} {print $0}'
+ 2865  cat $file | grep MaxR, | awk 'BEGIN {RS=","} {print $0}' | sed 's/$/,/g'
+ 2866  cat $file | grep MaxR, | awk 'BEGIN {RS=","} {print $0}' | sed 's/$/,/'
+ 2867  cat $file | grep MaxR, | awk 'BEGIN {RS=","} {print $0}' | sed -i 's/$/,/'
+ 2868  cat $file | grep MaxR, | awk 'BEGIN {RS=","} {print $0}' | sed -i '/$/,/'
+ 2869  cat $file | grep MaxR, | awk 'BEGIN {RS=","} {print $0}' | sed "s/$/,/"
+ 2870  cat $file | grep T0, | awk 'BEGIN {RS=","} {print $0}' | awk '{print NR}'
+ 2871  cat $file | grep T0, | awk 'BEGIN {RS=","} {print $0}' | awk '{print NF}'
+ 2872  cat $file | grep MaxR, | awk 'BEGIN {RS=","} {print $0}' | sed '$ d' | sed 's/$/,/g'
+ 2873  cat $file | grep MaxR, | awk 'BEGIN {RS=","} {print $0}' | sed '$ d' | sed 's/$/,/'
+ 2874  cat $file | grep MaxR, | awk 'BEGIN {RS=","} {print $0}' | sed '$ d'
+ 2875  Max50=$(cat $file | grep MaxR, | awk 'BEGIN {RS=","} {print $0}' | sed '$ d')
+ 2876  echo $Max50
+ 2877  M50=$(cat $file | grep M50, | awk 'BEGIN {RS=","} {print $0}' | sed '$ d')
+ 2878  MaxR=$(cat $file | grep MaxR, | awk 'BEGIN {RS=","} {print $0}' | sed '$ d')
+ 2879  T0=$(cat $file | grep T0, | awk 'BEGIN {RS=","} {print $0}' | sed '$ d')
+ 2880  paste <(echo "$M50") <(echo "$T0") <(echo "$MaxR") column -t
+ 2881  paste $M50 $T0 $MaxR
+ 2882  paste M50 T0 MaxR
+ 2883  paste (echo $M50) (echo $T0) (echo $MaxR)
+ 2884  paste <(echo $M50) <(echo $T0) <(echo $MaxR)
+ 2885  paste <(echo "$M50") <(echo $T0) <(echo $MaxR)
+ 2886  paste <(echo "$M50") <(echo "$T0") <(echo $MaxR)
+ 2887  paste <(echo "$M50") <(echo "$T0")
+ 2888  paste <(echo "$MaxR") <(echo "$M50") <(echo "$T0")
+ 2889  M50=$(cat $file | grep M50, | awk 'BEGIN {RS=","} {print $0}')
+ 2890  MaxR=$(cat $file | grep MaxR, | awk 'BEGIN {RS=","} {print $0}')
+ 2891  T0=$(cat $file | grep T0, | awk 'BEGIN {RS=","} {print $0}')
+ 2892  paste <(echo "$M50") <(echo "$T0") <(echo "$MaxR")
+ 2893  paste <(echo "$MaxR") <(echo "$M50")
+ 2894  paste <(echo "$MaxR") <(echo "$M50") | sed 's/\t/,/g'
+ 2895  paste <(echo "$MaxR") <(echo "$t0")
+ 2896  combinedData=$(paste <(echo $"T0") <(echo "$MaxR"))
+ 2897  echo combinedData
+ 2898  echo $combinedData
+ 2899  echo $(paste <(echo $"T0") <(echo "$MaxR"))
+ 2900  paste <(echo "$MaxR") <(echo "$T0")
+ 2901  paste <(echo "$MaxR") <(printf "$T0")
+ 2902  paste <(printf "$MaxR") <(printf "$T0")
+ 2903  echo $(paste <(printf "$MaxR") <(printf "$T0"))
+ 2904  printf $(paste <(printf "$MaxR") <(printf "$T0"))
+ 2905  printenv
+ 2906  declare -p
+ 2907  cls
+ 2908  ihstory
+ 2909  cat $file | grep T0,
+ 2910  T0=$(cat $file | grep T0,)
+ 2911  M50=$(cat $file | grep M50,)
+ 2912  MaxR=$(cat $file | grep MaxR,)
+ 2913  printf $T0
+ 2914  echo $(awk 'BEGIN {FS=","} print$1' $T0)
+ 2915  echo $T0 | awk 'BEGIN {FS=","} print$1'
+ 2916  echo $(awk 'BEGIN {FS=","} {print$1}' $T0)
+ 2917  echo $T0 | awk 'BEGIN {FS=","} {print$1}'
+ 2918  echo $T0 | awk 'BEGIN {FS=","} {print$2}'
+ 2919  header="Date,Subject,Experiment,Pass,T0,M50,MaxRate"
+ 2920  line1=
+ 2921  cat $file | grep Data
+ 2922  cat $file | grep Date
+ 2923  cat $file | grep Date -A 1
+ 2924  cat $file | grep Date -A 1 | awk 'BEGIN{FS=","} {print $6}'
+ 2925  cat $file | grep Date -A 1 | sed -d | awk 'BEGIN{FS=","} {print $6}'
+ 2926  cat $file | grep Date -A 1 | head -n -1  awk 'BEGIN{FS=","} {print $6}'
+ 2927  cat $file | grep Date -A 1 | head -n 1 | awk 'BEGIN{FS=","} {print $6}'
+ 2928  cat $file | grep Date -A 1 | tail -n 1 | awk 'BEGIN{FS=","} {print $6}'
+ 2929  cat $file | grep Date -A 1 | tail -n 1 | \n
+ 2930  date=$(cat $file | grep Date -A 1 | tail -n 1 | awk 'BEGIN{FS=","} {print $6}')
+ 2931  echo $date
+ 2932  cat $file
+ 2933  subject=$(cat $file | grep Date -A 1 | tail -n 1 | awk 'BEGIN{FS=","} {print $3}')
+ 2934  echo $subject
+ 2935  experiment=$(cat $file | grep Date -A 1 | tail -n 1 | awk 'BEGIN{FS=","} {print $5}')
+ 2936  cat $file | grep Date -A 1 | tail -n 1
+ 2937  experiment=$(cat $file | grep Date -A 1 | tail -n 1 | awk 'BEGIN{FS=","} {print $4}')
+ 2938  echo $experiment
+ 2939  echo $date , $subject , $experiment , 1
+ 2940  echo $date,$subject,$experiment,1
+ 2941  echo $date,$subject,$experiment,1,$(echo $T50 | awk '{print $2}'
+)
+ 2942  echo $date,$subject,$experiment,1,$(echo $T50 | awk '{print $2}')
+ 2943  $(echo $T50 | awk '{print $2}')
+ 2944  echo $date,$subject,$experiment,1,$(echo $T0 | awk '{print $2}')
+ 2945  echo $date,$subject,$experiment,1,$(echo $T0 | awk 'BEGIN {FS=","} {print $2}')
+ 2946  line1=$(echo $date,$subject,$experiment,1,$(echo $T0 | awk 'BEGIN {FS=","} {print $2}'))
+ 2947  line1=$(echo $date,$subject,$experiment,1,$(echo $T0 | awk 'BEGIN {FS=","} {print $2}'),$(echo $M50 | awk 'BEGIN {FS=","} {print $2}'), $(echo $MaxR | awk 'BEGIN {FS=","} {print $2}')))
+ 2948  line1=$(echo $date,$subject,$experiment,1,$(echo $T0 | awk 'BEGIN {FS=","} {print $2}'),$(echo $M50 | awk 'BEGIN {FS=","} {print $2}'), $(echo $MaxR | awk 'BEGIN {FS=","} {print $2}'))
+ 2949  line1=$(echo $date,$subject,$experiment,1,$(echo $T0 | awk 'BEGIN {FS=","} {print $2}'),$(echo $M50 | awk 'BEGIN {FS=","} {print $2}'),$(echo $MaxR | awk 'BEGIN {FS=","} {print $2}'))
+ 2950  echo $T0 $M50 $MaxR
+ 2951  echo $T0 \n $M50 \n $MaxR
+ 2952  echo $T0
+ 2953  echo $M50
+ 2954  echo $MaxR
+ 2955  echo $line1
+ 2956  echo $header
+ 2957  echo $header "\n" $line1
+ 2958  echo $header '\n' $line1
+ 2959  echo $header \n $line1
+ 2960  echo $header$line1
+ 2961  printf $header
+ 2962  printf $header \n $line1
+ 2963  printf $header \n $line1\n
+ 2964  printf ($header \n $line1\n)
+ 2965  printf $header
+ 2966  history
