@@ -18,7 +18,7 @@ parseDayFile --file !2018-07-06
 This generates ...
 ../_tmpFiles/2018-07-06_ICSS+IVSA_1H_FEMALES_BE20.tmp
 ../_csvFiles/2018-07-06_ICSS+IVSA_1H_FEMALES_BE20_rewards.csv
-../_csvFiles/2018-07-06_ICSS+IVSA_1H_FEMALES_BEo20_corrLever.csv
+../_csvFiles/2018-07-06_ICSS+IVSA_1H_FEMALES_BE20_corrLever.csv
 ../_csvFiles/2018-07-06_ICSS+IVSA_1H_FEMALES_BE20_incorrLever.csv
 
 ... and similar for other animals
