@@ -29,8 +29,77 @@ RELEASE DATE: Wednesday, Jan 23 2019
 AUTHOR: Suman Guha -- @sumankguha (github), @sug893 (code.harvard.edu)
 BLOCK
 
+# 0. ALGORITHM
+# ------------
+# This script takes a single file ICSS analysis (ANA) file and processes it for better analysis
+# The file is read, and then the metadata is extracted. A typical ANA file has the following two lines of metadata
+#
+
 # 1. FUNCTION SECTION
 # -------------------
+
+makeTmpFiles() # Parses individual subject/animal record into its separate file
+{
+	# 1. Generate array of start and end line numbers for each animal
+	# Generate line numbers where records start for individual animal --> Records for individual animals are separated by "Start Date:" and the last line of the whole file gives the end of the last record
+	tr -d '\r' < $fileName > $fileName.processed
+  fileName=$fileName.processed
+  endLine=$(wc -l < $fileName)
+	endLine=$(( $endLine + 1 )) # adding one to total line numbers because later the end is set as endLine - 1
+	lineNums=($(awk '/Start\ Date:/ {print FNR}' $fileName) $endLine)
+
+	# 1.2. Generate and array(s) meta-data variables
+	date="$(awk 'BEGIN {FS="!"} NR==1 {print $2}' $fileName)" #fist line of the day file has the date in the desired format and is preceded by ! which is used as a record separator
+	subjectList=($(awk '/Subject:/ {print $2}' $fileName)) #second record seems to be the name of the animals while the first record acts as the identifying pattern
+	experimentList=($(awk '/Experiment: / {print $2}' $fileName))
+	groupList=($(awk '/Group: / {print $2}' $fileName))
+
+	# 2. Splice and save individual animal record in .tmp files
+	# -----------------------------------------------------------
+	subjectNums=$(( ${#subjectList[@]} - 1 ))
+	for i in $(seq 0 $subjectNums)
+	do
+		tmpFile=$(echo $date"_"${experimentList[i]}"_"${groupList[i]}"_"${subjectList[$i]}.tmp)
+		startLine=${lineNums[$i]}
+		endLine=${lineNums[(( $i + 1 ))]}
+		endLine=$(( $endLine - 1 ))
+		sed -n "${startLine}, ${endLine}p" $fileName > $tmpFile
+	done
+  rm $fileName
+}
+
+makeCSV() # Parse indivual .tmp file to CSV files
+{
+	outputFileName=$(echo $tmpFile | sed -e 's/.tmp//') # setting output filename as .csv
+	# assigning lines to extract from
+	line1=$(awk '/E:/ {print FNR}' $tmpFile)	# line1 = start of "E:" field, which indicated correct lever presses
+	line2=$(awk '/F:/ {print FNR}' $tmpFile)	# line2 = start of "F:" field, which indicated incorrect lever presses
+	line3=$(awk '/G:/ {print FNR}' $tmpFile)	# line3 = start of "G:" field, which indicated reward dispension
+	line4=$(wc -l < $tmpFile) 								# line4 = end line of the file, indicating where the G field would end
+	#----------debug----------
+	#echo $outputFileName
+	#echo $line1
+	#echo $line2
+	#echo $line3
+	#echo $line4
+
+	# extracting E: F: G: fields and deleting all 0: 5: 10: ... and 0.000 values and setting them as lever press and reward times
+	# ---------------------------------------------------------------------------------------------------------------------------
+	corrLeverPress=$(awk -v s="$line1" -v e="$line2" 'NR>s && NR<e' $tmpFile | sed -e 's/.*: //g' | sed -e 's/ 0\.000//g' | tr -d '\n')
+	incorrLeverPress=$(awk -v s="$line2" -v e="$line3" 'NR>s && NR<e' $tmpFile | sed -e 's/.*: //g' | sed -e 's/ 0\.000//g' | tr -d '\n')
+	rewards=$(awk -v s="$line3" -v e="$line4" 'NR>s && NR<e' $tmpFile | sed -e 's/.*: //g' | sed -e 's/ 0\.000//g' | tr -d '\n')
+	corr_varNum=$(echo $corrLeverPress | awk 'BEGIN{RS=" "; OFS=","} END{print FNR}')
+	incorr_varNum=$(echo $incorrLeverPress | awk 'BEGIN{RS=" "; OFS=","} END{print FNR}')
+	reward_varNum=$(echo $rewards | awk 'BEGIN{RS=" "; OFS=","} END{print FNR}')
+
+	# Saving data to file
+	outputFile=$(echo $outputFileName\_corrLever.csv)
+	echo "eventTime" $corrLeverPress | tr -s ' ' '\n' > $outputFile
+	outputFile=$(echo $outputFileName\_rewards.csv)
+	echo "eventTime" $rewards | tr -s ' ' '\n' > $outputFile
+	outputFile=$(echo $outputFileName\_incorrLever.csv)
+	echo "eventTime" $incorrLeverPress | tr -s ' ' '\n' > $outputFile
+}
 
 # 2. INPUT SECTION
 # ----------------
@@ -71,6 +140,9 @@ case $switch in
 		# ...
 		# ...
 
+		tr -d '\r' < $fileName > $fileName.processed
+		fileName=$fileName.processed
+
 		header="Date,Subject,Experiment,Pass,T0,M50,MaxRate"
 		experimentDate=$(cat $fileName | grep Date -A 1 | tail -n 1 | awk 'BEGIN {FS=","} {print $6}')
 		subject=$(cat $fileName | grep Date -A 1 | tail -n 1 | awk 'BEGIN {FS=","} {print $3}')
@@ -79,13 +151,60 @@ case $switch in
 		t0=($(cat $fileName | grep T0, | sed 's/T0,//g' | awk 'BEGIN {FS=","} {print $0}' | sed 's/,/ /g'))
 		m50=($(cat $fileName | grep M50, | sed 's/M50,//g' | awk 'BEGIN {FS=","} {print $0}' | sed 's/,/ /g'))
 		maxRate=($(cat $fileName | grep MaxR, | sed 's/MaxR,//g' | awk 'BEGIN {FS=","} {print $0}' | sed 's/,/ /g'))
+		# debug section
+		# echo $header
+		# echo $experimentDate
+		# echo $subject
+		# echo $experiment
+		# echo ${pass[@]}
+		# echo ${t0[@]}
+		# echo ${m50[@]}
+		# echo ${maxRate[@]}
 		line1=$experimentDate,$subject,$experiment,${pass[0]},${t0[0]},${m50[0]},${maxRate[0]}
 		line2=$experimentDate,$subject,$experiment,${pass[1]},${t0[1]},${m50[1]},${maxRate[1]}
 		line3=$experimentDate,$subject,$experiment,${pass[2]},${t0[2]},${m50[2]},${maxRate[2]}
 		line4=$experimentDate,$subject,$experiment,${pass[3]},${t0[3]},${m50[3]},${maxRate[3]}
+		# debug section
+		# echo $line1
+		# echo $line2
+		# echo $line3
+		# echo $line4
 		outputFileName=$experimentDate"_"$subject"_ICSS_"$experiment"_preprocessed.csv"
-		echo $header $line1 $line2 $line3 $line4 | tr -s ' ' '\n' > $outputFileName
+		echo $header $line1 $line2 $line3 $line4 | tr -s ' ' '\n' #> $outputFileName
 		;;
 	"IVSA")
+	# 1. Split day file into separate .tmp file per animal
+	# ----------------------------------------------------
+		makeTmpFiles # function call
+
+		# 2. Load individual animal's day file and make .csv files that show reward, correct lever press, and incorrect lever press timings
+		# ---------------------------------------------------------------------------------------------------------------------------------
+		for tmpFile in $(ls $date*.tmp)
+		do
+			outputFileName=$(echo $tmpFile | sed -e 's/.tmp/.csv/')
+			makeCSV
+		done
+
+		# 3. Arrange files into folders
+		# -----------------------------
+
+		# move .tmp files into ../_tmpFiles
+		if [ ! -d "../_tmpFiles" ]
+		then
+			mkdir ../_tmpFiles
+			mv *.tmp ../_tmpFiles
+		else
+			mv *.tmp ../_tmpFiles
+		fi
+
+		# move .csv files into ../_csvFiles
+		if [ ! -d "../_csvFiles" ]
+		then
+			mkdir ../_csvFiles
+			mv *.csv ../_csvFiles
+		else
+			mv *.csv ../_csvFiles
+		fi
+
 		;;
 esac
