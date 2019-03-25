@@ -12,8 +12,8 @@ INPUT FLAGS:
 --file or -f	: the day file
 
 EXAMPLE:
-parseDayFile -f !2018-07-06
-parseDayFile --file !2018-07-06
+preprocessIVSAFiles -f !2018-07-06
+preprocessIVSAFiles --file !2018-07-06
 
 This generates ...
 ../_tmpFiles/2018-07-06_ICSS+IVSA_1H_FEMALES_BE20.tmp

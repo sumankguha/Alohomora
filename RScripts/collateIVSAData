@@ -32,7 +32,7 @@ DATA TABLE DESCRIPTION:
   ...
 
 EXAMPLE:
-collateData <enter rewardsData fileName>
+collateIVSAData <enter rewardsData fileName>
 
 This generates a data table that is saved as ...
 <date>_<cohort>_<regimen>_<group>_<subjectID>_collated.csv
