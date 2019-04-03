@@ -170,7 +170,7 @@ case $switch in
 		# echo $line3
 		# echo $line4
 		outputFileName=$experimentDate"_"$subject"_ICSS_"$experiment"_preprocessed.csv"
-		echo $header $line1 $line2 $line3 $line4 | tr -s ' ' '\n' #> $outputFileName
+		echo $header $line1 $line2 $line3 $line4 | tr -s ' ' '\n' > $outputFileName
 		;;
 	"IVSA")
 	# 1. Split day file into separate .tmp file per animal
