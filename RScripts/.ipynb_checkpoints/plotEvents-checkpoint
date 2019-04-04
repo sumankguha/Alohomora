@@ -1,0 +1,135 @@
+#! /usr/bin/env Rscript
+
+# 0. HELPER AND INPUT SECTION
+# ---------------------------
+
+# Loading libraries
+# -----------------
+library(argparser, quietly = TRUE)
+library(stringr, quietly = TRUE)
+library(readr, quietly = TRUE)
+library(ggplot2, quietly = TRUE)
+
+# Creating a parser
+# -----------------
+p <- argparser::arg_parser(
+  "SCRIPT DESCRIPTION:
+  This script runs over a .csv file to generate a reward dispension events plot per epoch.
+
+GRAPH/PLOT DESCRIPTION:
+  X-Axis (1): Time in seconds from 0 to 3600 (for ShA), 21600 (for LgA), or
+  X-Axis (2): Rug plot showing individual reward times
+  Y-Axis (1): 60 s binned frequency distribution histogram of rewards (grey bars)
+  Y-Axis (2): 60 s binned frequency distribution histogram of correct lever press (green bars)
+  Y-Axis (3): 60 s binned frequency distribution histogram of incorrect lever press (red bars)
+
+EXAMPLE:
+plotEvents <enter file name here>
+
+This generates a plot that is saved as ...
+../_plots/<SubjectID>_<Regimen>_<DATE>.pdf
+
+CAVEAT: The script needs to be evoked in the _csvFiles directory and works on files generated using parseDayFile script
+        The script generates the filenames for various events automatically, so if you're batch processing and automating file handling make sure you pass in files of only one event type
+
+VERSION: 1.1 'Plots Everywhere'
+RELEASE DATE: Sun Aug 08 2018
+RELEASE NOTE: Added options to adjust y-axis limit and histogram bin widths
+AUTHOR: Suman Guha -- @sumankguha (github), @sug893 (code.harvard.edu)
+"
+)
+
+# Add command line arguments
+# --------------------------
+# primary argument(s)
+p <- argparser::add_argument(p, "fileName", help="Name of .csv IVSA file", type="character")
+# optional argument(s)
+p <- argparser::add_argument(p, "--yAxisLimit", help="upper limit of y-axis", type="numeric", default=50)
+p <- argparser::add_argument(p, "--binWidth", help="bin width for frequency distribution histograms", type="numeric", default=60)
+p <- argparser::add_argument(p, "--fileSuffix", help="suffix to file name", type="character", default="")
+
+# Parse command line arguments
+# ----------------------------
+argv <- parse_args(p)
+rewardFileName = argv$fileName  # parsing file name into variable
+yAxisLimit = argv$yAxisLimit    # parsing y-axis limit from variable
+binWidth = argv$binWidth        # parsing binwidth from variable
+fileSuffix = argv$fileSuffix    # parsing binwidth from variable
+
+# 1. MAIN FUNCTION
+# ----------------
+fileParts <- str_split(rewardFileName, "_")[[1]] # split file name to generate metadata
+date <- fileParts[1]
+cohort <- fileParts[2]
+regimen <- fileParts[3]
+group <- fileParts[4]
+subject <- fileParts[5]
+
+# 1.1. generating file names to read from. Redundancy for operator error
+# ----------------------------------------------------------------------
+rewardsDataFile <- str_c(date, cohort, regimen, group, subject, "rewards.csv", sep = "_")
+corrLeverDataFile <- str_c(date, cohort, regimen, group, subject, "corrLever.csv", sep = "_")
+incorrLeverDataFile <- str_c(date, cohort, regimen, group, subject, "incorrLever.csv", sep = "_")
+
+# ---------- debug section ----------
+#print(rewardsDataFile)
+#print(corrLeverDataFile)
+#print(incorrLeverDataFile)
+
+# 1.2 Read data in
+# ----------------
+rewardTimes <- read_csv(rewardsDataFile, col_type = cols())
+corrLeverTimes <- read_csv(corrLeverDataFile, col_type = cols())
+incorrLeverTimes <- read_csv(incorrLeverDataFile, col_type = cols())
+
+# ---------- debug section ----------
+#rewardTimes %>% print
+#corrLeverTimes %>% print
+#incorrLeverTimes %>% print
+
+# 2. GENERATE PLOT
+# ------------------
+plot_title <- str_c(subject, regimen, date, sep = " ") # generate plot title
+
+# set x-axis according to whether it is a ShA/LgA regimen and then plot
+if (regimen == "1H") {
+  eventsPlot <- ggplot() +
+    ggtitle(plot_title) + theme_minimal() +
+    geom_histogram(data = corrLeverTimes, aes(x = eventTime), binwidth = binWidth, color = "green", fill = "green", alpha = 0.5) +
+    geom_histogram(data = incorrLeverTimes, aes(x = eventTime), binwidth = binWidth, color = "red", fill = "red", alpha = 0.5) +
+    geom_histogram(data = rewardTimes, aes(x = eventTime), binwidth = binWidth, color = "grey", fill = "grey", alpha = 0.7) +
+    geom_rug(data = rewardTimes, aes(x = eventTime)) +
+    xlim(c(0,3600)) + ylim(c(0, yAxisLimit)) +
+    xlab("Time (s)") + ylab("Event Frequency")
+} else if (regimen == "6H") {
+  eventsPlot <- ggplot() +
+    ggtitle(plot_title) + theme_minimal() +
+    geom_histogram(data = corrLeverTimes, aes(x = eventTime), binwidth = binWidth, color = "green", fill = "green", alpha = 0.5) +
+    geom_histogram(data = incorrLeverTimes, aes(x = eventTime), binwidth = binWidth, color = "red", fill = "red", alpha = 0.5) +
+    geom_histogram(data = rewardTimes, aes(x = eventTime), binwidth = binWidth, color = "grey", fill = "grey", alpha = 0.7) +
+    geom_rug(data = rewardTimes, aes(x = eventTime)) +
+    xlim(c(0,21600)) + ylim(c(0, yAxisLimit)) +
+    xlab("Time (s)") + ylab("Event Frequency")
+} else if (regimen == "3H") {
+  eventsPlot <- ggplot() +
+    ggtitle(plot_title) + theme_minimal() +
+    geom_histogram(data = corrLeverTimes, aes(x = eventTime), binwidth = binWidth, color = "green", fill = "green", alpha = 0.5) +
+    geom_histogram(data = incorrLeverTimes, aes(x = eventTime), binwidth = binWidth, color = "red", fill = "red", alpha = 0.5) +
+    geom_histogram(data = rewardTimes, aes(x = eventTime), binwidth = binWidth, color = "grey", fill = "grey", alpha = 0.7) +
+    geom_rug(data = rewardTimes, aes(x = eventTime)) +
+    xlim(c(0,10800)) + ylim(c(0, yAxisLimit)) +
+    xlab("Time (s)") + ylab("Event Frequency")
+}
+
+# dynamically set output file name for plot as <subjectID>_<regimen>_<date>, (optional) file suffix; then prefix with "../_plots/" and suffix with ".pdf"
+plot_fileName <- str_c(subject, regimen, date, sep = "_")
+if(fileSuffix != "") {
+  plot_fileName <- str_c(plot_fileName, fileSuffix, sep = "_")
+}
+plot_fileName <- str_c("../_plots/", plot_fileName, "_individualEventsPlot.pdf")
+
+# check if ../_plots directory exists or not. If not create it
+if(!dir.exists("../_plots")) {dir.create("../_plots")}
+
+# save plot with specific dimensions
+ggsave(plot_fileName, plot = eventsPlot, device = "pdf", width = 190, height = 95, units = "mm")
