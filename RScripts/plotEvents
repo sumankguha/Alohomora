@@ -119,6 +119,15 @@ if (regimen == "1H") {
     geom_rug(data = rewardTimes, aes(x = eventTime)) +
     xlim(c(0,10800)) + ylim(c(0, yAxisLimit)) +
     xlab("Time (s)") + ylab("Event Frequency")
+} else if (regimen == "2H") {
+  eventsPlot <- ggplot() +
+    ggtitle(plot_title) + theme_minimal() +
+    geom_histogram(data = corrLeverTimes, aes(x = eventTime), binwidth = binWidth, color = "green", fill = "green", alpha = 0.5) +
+    geom_histogram(data = incorrLeverTimes, aes(x = eventTime), binwidth = binWidth, color = "red", fill = "red", alpha = 0.5) +
+    geom_histogram(data = rewardTimes, aes(x = eventTime), binwidth = binWidth, color = "grey", fill = "grey", alpha = 0.7) +
+    geom_rug(data = rewardTimes, aes(x = eventTime)) +
+    xlim(c(0,7200)) + ylim(c(0, yAxisLimit)) +
+    xlab("Time (s)") + ylab("Event Frequency")
 }
 
 # dynamically set output file name for plot as <subjectID>_<regimen>_<date>, (optional) file suffix; then prefix with "../_plots/" and suffix with ".pdf"
