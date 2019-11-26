@@ -23,8 +23,8 @@ This generates ...
 
 ... and similar for other animals
 
- CAVEAT:
- The script needs to be evoked in the _rigFiles directory.
+CAVEAT:
+The script needs to be evoked in the _rigFiles directory.
 
 VERSION: 1.1 'BillionBunnies' (Because it creates a billion files)
 RELEASE DATE: Sun Aug 08 2018
@@ -35,23 +35,34 @@ BLOCK
 # 1. FUNCTION SECTION
 # -------------------
 
-makeTmpFiles() # Parses individual subject/animal record into its separate file
+makeTmpFiles_macOS() # Parses individual subject/animal record into its separate file
 {
-	# 1. Generate array of start and end line numbers for each animal
-	# Generate line numbers where records start for individual animal --> Records for individual animals are separated by "Start Date:" and the last line of the whole file gives the end of the last record
-	tr -d '\r' < $fileName > $fileName.processed
-  fileName=$fileName.processed
-  endLine=$(wc -l < $fileName)
-	endLine=$(( $endLine + 1 )) # adding one to total line numbers because later the end is set as endLine - 1
-	lineNums=($(awk '/Start\ Date:/ {print FNR}' $fileName) $endLine)
+	# 1. Formatting files to make them machine legible
+	# ------------------------------------------------
+	# 1.1. Add extra line at the end of file
+	sed -e '$a\' $fileName > $fileName.withEOL
+	# 1.2. Remove all extra carriage return symbols that windows adds
+	tr -d '\r' < $fileName.withEOL > $fileName.processed
+	rm $fileName.withEOL
+	fileName=$fileName.processed
 
-	# 1.2. Generate and array(s) meta-data variables
-	date="$(awk 'BEGIN {FS="!"} NR==1 {print $2}' $fileName)" #fist line of the day file has the date in the desired format and is preceded by ! which is used as a record separator
-	subjectList=($(awk '/Subject:/ {print $2}' $fileName)) #second record seems to be the name of the animals while the first record acts as the identifying pattern
+	# 2. Generate array of start and end line numbers for each animal
+	# ---------------------------------------------------------------
+	# last line of the whole file gives the end of the last record
+	endLine=$(wc -l < $fileName)
+	endLine=$(( $endLine + 1 )) # adding one to total line numbers because later the end is set as endLine - 1
+	
+	# Records for individual animals are separated by "Start Date:" 
+	lineNums=($(awk '/Start\ Date:/ {print FNR}' $fileName) $endLine)
+	
+	# 3. Generate and array(s) meta-data variables
+	# --------------------------------------------
+	date="$(awk 'BEGIN {FS="!"} NR==1 {print $2}' $fileName)" 	#fist line of the day file has the date in the desired format and is preceded by ! which is used as a record separator
+	subjectList=($(awk '/Subject:/ {print $2}' $fileName)) 		#second record seems to be the name of the animals while the first record acts as the identifying pattern
 	experimentList=($(awk '/Experiment: / {print $2}' $fileName))
 	groupList=($(awk '/Group: / {print $2}' $fileName))
-
-	# 2. Splice and save individual animal record in .tmp files
+	
+	# 4. Splice and save individual animal record in .tmp files
 	# -----------------------------------------------------------
 	subjectNums=$(( ${#subjectList[@]} - 1 ))
 	for i in $(seq 0 $subjectNums)
@@ -62,17 +73,18 @@ makeTmpFiles() # Parses individual subject/animal record into its separate file
 		endLine=$(( $endLine - 1 ))
 		sed -n "${startLine}, ${endLine}p" $fileName > $tmpFile
 	done
-  rm $fileName
+	rm $fileName
 }
 
-makeCSV() # Parse indivual .tmp file to CSV files
+makeCSV_macOS() # Parse indivual .tmp file to CSV files
 {
 	outputFileName=$(echo $tmpFile | sed -e 's/.tmp//') # setting output filename as .csv
 	# assigning lines to extract from
 	line1=$(awk '/E:/ {print FNR}' $tmpFile)	# line1 = start of "E:" field, which indicated correct lever presses
 	line2=$(awk '/F:/ {print FNR}' $tmpFile)	# line2 = start of "F:" field, which indicated incorrect lever presses
 	line3=$(awk '/G:/ {print FNR}' $tmpFile)	# line3 = start of "G:" field, which indicated reward dispension
-	line4=$(wc -l < $tmpFile) 								# line4 = end line of the file, indicating where the G field would end
+	line4=$(wc -l < $tmpFile) 			# line4 = end line of the file, indicating where the G field would end
+	
 	#----------debug----------
 	#echo $outputFileName
 	#echo $line1
@@ -82,12 +94,30 @@ makeCSV() # Parse indivual .tmp file to CSV files
 
 	# extracting E: F: G: fields and deleting all 0: 5: 10: ... and 0.000 values and setting them as lever press and reward times
 	# ---------------------------------------------------------------------------------------------------------------------------
-	corrLeverPress=$(awk -v s="$line1" -v e="$line2" 'NR>s && NR<e' $tmpFile | sed -e 's/.*: //g' | sed -e 's/ 0\.000//g' | tr -d '\n')
-	incorrLeverPress=$(awk -v s="$line2" -v e="$line3" 'NR>s && NR<e' $tmpFile | sed -e 's/.*: //g' | sed -e 's/ 0\.000//g' | tr -d '\n')
-	rewards=$(awk -v s="$line3" -v e="$line4" 'NR>s && NR<e' $tmpFile | sed -e 's/.*: //g' | sed -e 's/ 0\.000//g' | tr -d '\n')
-	corr_varNum=$(echo $corrLeverPress | awk 'BEGIN{RS=" "; OFS=","} END{print FNR}')
-	incorr_varNum=$(echo $incorrLeverPress | awk 'BEGIN{RS=" "; OFS=","} END{print FNR}')
-	reward_varNum=$(echo $rewards | awk 'BEGIN{RS=" "; OFS=","} END{print FNR}')
+	corr_varNum=$(awk '/A:/ {print $2}' $tmpFile)
+	if [ corr_varNum > 0.000 ]
+	then
+		corrLeverPress=$(awk -v s="$line1" -v e="$line2" 'NR>s && NR<e' $tmpFile | sed -e 's/.*: //g' | tr -d '\n')
+	else
+		corrLeverPress=$(awk -v s="$line1" -v e="$line2" 'NR>s && NR<e' $tmpFile | sed -e 's/.*: //g' | sed -e 's/ 0\.000//g' | tr -d '\n')
+	fi
+
+	incorr_varNum=$(awk '/B:/ {print $2}' $tmpFile)
+	if [ incorr_varNum > 0.000 ]
+	then
+		incorrLeverPress=$(awk -v s="$line2" -v e="$line3" 'NR>s && NR<e' $tmpFile | sed -e 's/.*: //g' | tr -d '\n')
+	else
+		incorrLeverPress=$(awk -v s="$line2" -v e="$line3" 'NR>s && NR<e' $tmpFile | sed -e 's/.*: //g' | sed -e 's/ 0\.000//g' | tr -d '\n')
+	fi
+
+	reward_varNum=$(awk '/C:/ {print $2}' $tmpFile)
+	if [ reward_varNum > 0.000 ]
+	then
+		rewards=$(awk -v s="$line3" -v e="$line4" 'NR>s && NR<e' $tmpFile | sed -e 's/.*: //g' | tr -d '\n')
+	else
+		rewards=$(awk -v s="$line3" -v e="$line4" 'NR>s && NR<e' $tmpFile | sed -e 's/.*: //g' | sed -e 's/ 0\.000//g' | tr -d '\n')
+	fi
+
 
 	# Saving data to file
 	outputFile=$(echo $outputFileName\_corrLever.csv)
@@ -123,14 +153,14 @@ done
 
 # 1. Split day file into separate .tmp file per animal
 # ----------------------------------------------------
-makeTmpFiles # function call
+makeTmpFiles_macOS # function call
 
 # 2. Load individual animal's day file and make .csv files that show reward, correct lever press, and incorrect lever press timings
 # ---------------------------------------------------------------------------------------------------------------------------------
 for tmpFile in $(ls $date*.tmp)
 do
 	outputFileName=$(echo $tmpFile | sed -e 's/.tmp/.csv/')
-	makeCSV
+	makeCSV_macOS
 done
 
 # 3. Arrange files into folders
