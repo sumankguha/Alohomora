@@ -7,14 +7,14 @@ Welcome to the Alohomora repository, a toolbox for
 A **typical** use case is: 
 - generate a dataframe for raw variables
 	- Session-wide
-		- Total infusions
-		- Total active lever
-		- Total inactive lever
-		- Preference score
-		- Ratio = active / infusions
-		- active lever interactions during infusion and time-out periods
-		- Cumulative infusions
-		- Cumulative active lever
+
+
+
+
+
+
+
+
 	- Hour-wise per session
 		- 1-h binned infusions
 		- 1-h binned active lever
@@ -42,6 +42,11 @@ A **typical** use case is:
 
 - Transform variables for
 	- 
+
+- UtilityScripts: 
+	- preprocessIVSAFiles: bash script to parse MedPC log file to csv input files
+	- collateIVSAData: R function to combine csv input files to single dataframe
+
 ## Installation guide
 - Technical considerations
 	- Hardware requirements
@@ -49,7 +54,22 @@ A **typical** use case is:
 - R environment
 ## Demo
 
-- User guide (detailed walkthrough with labeled example data)
+### User guide (detailed walkthrough with labeled example data)
+####  Using the toolbox code — generating dataframes instructions
+0. Preprocessing 
+	- preprocessIVSAFiles:	This bash script parses MedPC log files to csv files for individual animals
+	- collateIVSAData: 	This R function combines individual files into a single data file
+1. Generate session-wise metrics
+	The R notebook (makeDataFrame_IVSA_sessionWide.Rmd) generates session-wide metrics from individual data files (.csv). The metrics generated are 
+	- Total infusions                                               			-
+	- Total active lever
+	- Total inactive lever
+	- Preference score
+	- Ratio = active / infusions
+	- active lever interactions during infusion and time-out periods
+	- Cumulative infusions
+	- Cumulative active lever
+
 - Quick guide for training a tailored feature detector network
 - Quick guide for evaluation of feature detectors
 
