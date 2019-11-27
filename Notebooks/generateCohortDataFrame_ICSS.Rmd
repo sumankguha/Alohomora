@@ -1,0 +1,82 @@
+---
+title:  "Generate ICSS dataframe for a cohort"
+author: "Suman Guha"
+date: "11/27/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+This notebook compiles all the ICSS files for all the animals of a cohort into a single  
+
+## 1. Setting variables
+```{r}
+# directory where individual animal data is stored
+dataDir <- ""
+
+# landmark dates for experiment/cohort
+preSurgeryStartDate   <- ""
+shaStartDate          <- ""
+
+# animals in the analysis
+subjectList <- c("", 
+                 "",
+                 "",
+                 "")
+
+# group information
+group_lgaFemale <- c("")
+group_lgaMale   <- c("")
+group_shaFemale <- c("")
+group_shaMale   <- c("")
+
+# output files 
+outputFileName_allDates       <- ""
+outputFileName_baseLineDates  <- ""
+outputFileName_SelfAdminDates <- ""
+
+```
+
+## 2. Generating combined dataframe
+```{r, include=FALSE}
+fileList <- list.files(path = dataDir, pattern = "preprocessed.csv", recursive = T)
+data <- 
+  fileList %>%
+  purrr::map(~ readr::read_csv(file.path(dataDir, .))) %>%
+  purrr::reduce(rbind)
+
+# subsetting data to subjects and dates
+data <- 
+  data %>%
+  dplyr::filter(Subject %in% subjectList)
+
+data <-
+  data %>%
+  dplyr::filter(Date >= preSurgeryStartDate)
+```
+
+## 3. Annotating data
+```{r}
+data$Experiment[data$Subject %in% group_lgaFemale]  <- c("LgA-Female")
+data$Experiment[data$Subject %in% group_lgaMale]    <- c("LgA-Male")
+data$Experiment[data$Subject %in% group_shaFemale]  <- c("ShA-Female")
+data$Experiment[data$Subject %in% group_shaMale]    <- c("ShA-Female")
+```
+
+## 4. Save data
+```{r}
+readr::write_csv(data, file.path(dataDir, outputFileName_allDates))
+
+baselineData <- 
+  data %>%
+  dplyr::filter(Dates >= preSurgeryStartDate & Dates < shaStartDate)
+readr::write_csv(baselineData, file.path(dataDir, outputFileName_baseLineDates))
+
+selfAdminData <-
+  data %>% 
+  dplyr::filter(Dates >= shaStartDate)
+readr::write_csv(selfAdminData, file.path(dataDir, outputFileName_SelfAdminDates))
+```
