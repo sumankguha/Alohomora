@@ -18,8 +18,8 @@ This notebook compiles all the ICSS files for all the animals of a cohort into a
 dataDir <- ""
 
 # landmark dates for experiment/cohort
-preSurgeryStartDate   <- ""
-shaStartDate          <- ""
+baselineDates   <- c("")
+shaStartDate    <- c("")
 
 # animals in the analysis
 subjectList <- c("", 
@@ -34,9 +34,9 @@ group_shaFemale <- c("")
 group_shaMale   <- c("")
 
 # output files 
-outputFileName_allDates       <- ""
-outputFileName_baseLineDates  <- ""
-outputFileName_SelfAdminDates <- ""
+outputFileName_allDates         <- ""
+outputFileName_baseLineDates    <- ""
+outputFileName_experimentDates  <- ""
 
 ```
 
