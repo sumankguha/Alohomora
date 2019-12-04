@@ -2,14 +2,15 @@ Package: Alohomora
 Title: What the Package Does (one line, title case)
 Version: 0.0.0.9000
 Authors@R: c(
-  person("Suman", "Guha", email = "skguha@mclean.harvard.edu", role = c("aut", "cre"))
+  person("Suman", "Guha", email = "skguha@mclean.harvard.edu", role = c("aut")),
   person("Elena", "Chartoff", email = "echartoff@mclean.harvard.edu", role = c("cre")))
 Description: What the package does (one paragraph).
 Depends: R (>= 3.5.0)
-License: What license is it under?
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Imports: 
  argparser,
  tidyverse,
- lubridate
+ lubridate,
+ stringr
