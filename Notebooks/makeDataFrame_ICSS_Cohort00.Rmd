@@ -72,11 +72,11 @@ readr::write_csv(data, file.path(dataDir, outputFileName_allDates))
 
 baselineData <- 
   data %>%
-  dplyr::filter(Dates >= preSurgeryStartDate & Dates < shaStartDate)
+  dplyr::filter(Dates %in% baselineDates)
 readr::write_csv(baselineData, file.path(dataDir, outputFileName_baseLineDates))
 
-selfAdminData <-
+experimentData <-
   data %>% 
   dplyr::filter(Dates >= shaStartDate)
-readr::write_csv(selfAdminData, file.path(dataDir, outputFileName_SelfAdminDates))
+readr::write_csv(experimentData, file.path(dataDir, outputFileName_experimentDates))
 ```
