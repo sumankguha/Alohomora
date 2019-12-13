@@ -15,30 +15,30 @@ This notebook compiles all the ICSS files for all the animals of a cohort into a
 ## 1. Setting variables
 ```{r}
 # directory where individual animal data is stored
-dataDir <- "~/Dropbox (Partners HealthCare)/Projects/R01_2017_OxycSA-NASh-Glutamate/_data_R01_2017/_data_R01_2017_ICSS/_ana_files/PM_ICSS/Cohort00/"
+dataDir <- "~/Dropbox (Partners HealthCare)/Projects/R01_2017_OxycSA-NASh-Glutamate/_data_R01_2017/_data_R01_2017_ICSS/_ana_files/PM_ICSS/Cohort01/"
 
 # landmark dates for experiment/cohort
-baselineDates   <- c("")
-shaStartDate    <- c("")
+baselineDates   <- c("2019-02-04", "2019-02-06", "2019-02-07", "2019-02-08", "2019-02-18", "2019-02-19")
+shaStartDate    <- c("2019-02-20")
 
 # animals in the analysis
-subjectList <- c("",
-                 "",
-                 "",
-                 "")
+subjectList <- c("SG24", "SG20", 
+                 "SG15",
+                 "SG14",
+                 "SG17")
 
 # group information
-group_lgaFemale <- c()
-group_lgaMale   <- c()
-group_shaFemale <- c()
-group_shaMale   <- c()
+group_lgaFemale <- c("SG24", "SG20")
+group_lgaMale   <- c("SG15")
+group_shaFemale <- c("SG14")
+group_shaMale   <- c("SG17")
 
 # output files 
-outputFileName_allDates                 <- "_icssDataframe_allDates_cohort00.csv"
-outputFileName_baseLineDates_longform   <- "_icssDataframe_baselineDates_longform_cohort00.csv"
-outputFileName_baseLineDates_wideform   <- "_icssDataframe_baselineDates_wideform_cohort00.csv"
-outputFileName_experimentDates_longform <- "_icssDataframe_experimentDates_longform_cohort00.csv"
-outputFileName_experimentDates_wideform <- "_icssDataframe_experimentDates_wideform_cohort00.csv"
+outputFileName_allDates                 <- "_icssDataframe_allDates_cohort01.csv"
+outputFileName_baseLineDates_longform   <- "_icssDataframe_baselineDates_longform_cohort01.csv"
+outputFileName_baseLineDates_wideform   <- "_icssDataframe_baselineDates_wideform_cohort01.csv"
+outputFileName_experimentDates_longform <- "_icssDataframe_experimentDates_longform_cohort01.csv"
+outputFileName_experimentDates_wideform <- "_icssDataframe_experimentDates_wideform_cohort01.csv"
 
 ```
 
