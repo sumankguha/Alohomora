@@ -1,0 +1,198 @@
+---
+title:  "Generate ICSS dataframe for cohort01"
+author: "Suman Guha"
+date: "12/04/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+This notebook compiles all the ICSS files for all the animals of a cohort into a single  
+
+## 1. Setting variables
+```{r}
+# directory where individual animal data is stored
+dataDir <- ""
+
+# landmark dates for experiment/cohort
+baselineDates   <- c("2019-02-04", "2019-02-06", "2019-02-07", "2019-02-08", "2019-02-18", "2019-02-19")
+shaStartDate    <- c("2019-02-20")
+
+# animals in the analysis
+subjectList <- c("", "", 
+                 "",
+                 "",
+                 "")
+
+# group information
+group_lgaFemale <- c("", "")
+group_lgaMale   <- c("")
+group_shaFemale <- c("")
+group_shaMale   <- c("")
+
+# output files 
+outputFileName_allDates                 <- "_icssDataframe_allDates_cohort00.csv"
+outputFileName_baseLineDates_longform   <- "_icssDataframe_baselineDates_longform_cohort00.csv"
+outputFileName_baseLineDates_wideform   <- "_icssDataframe_baselineDates_wideform_cohort00.csv"
+outputFileName_experimentDates_longform <- "_icssDataframe_experimentDates_longform_cohort00.csv"
+outputFileName_experimentDates_wideform <- "_icssDataframe_experimentDates_wideform_cohort00.csv"
+
+```
+
+## 2. Generating combined dataframe
+```{r, include=FALSE}
+fileList <- list.files(path = dataDir, pattern = "preprocessed.csv", recursive = T)
+data <- 
+  fileList %>%
+  purrr::map(~ readr::read_csv(file.path(dataDir, .))) %>%
+  purrr::reduce(rbind)
+
+# subsetting data to subjects and dates
+data <- 
+  data %>%
+  dplyr::filter(Subject %in% subjectList)
+```
+
+## 3. Annotating data
+```{r}
+data$Experiment[data$Subject %in% group_lgaFemale]  <- c("LgA-Female")
+data$Experiment[data$Subject %in% group_lgaMale]    <- c("LgA-Male")
+data$Experiment[data$Subject %in% group_shaFemale]  <- c("ShA-Female")
+data$Experiment[data$Subject %in% group_shaMale]    <- c("ShA-Male")
+```
+
+## 4. Save data
+### 4.1. Data for all dates
+```{r}
+readr::write_csv(data, file.path(dataDir, outputFileName_allDates))
+```
+
+### 4.2. Data for baseline dates
+```{r}
+# Generating baseline dataframe
+# -----------------------------
+baselineData <- 
+  data %>%
+  dplyr::filter(Date %in% as.Date(baselineDates))
+
+baselineSessionNum <- 
+  baselineData %>% 
+  dplyr::select(Date) %>%
+  unique %>% dplyr::arrange(Date) %>%
+  dplyr::mutate(SessionNum = seq(-5, 0))
+
+baselineData <- 
+  dplyr::left_join(baselineSessionNum, baselineData, by = "Date") %>%
+  dplyr::arrange(Subject, Date)
+
+# writing longform dataframe to disk
+readr::write_csv(baselineData, file.path(dataDir, outputFileName_baseLineDates_longform))
+
+# Generating wideform dataframe
+baselineData_wideform <- 
+  baselineData %>% 
+  dplyr::select(Date, SessionNum, Subject, Experiment, Pass, T0) %>%
+  dplyr::group_by(Date, SessionNum, Subject, Experiment) %>%
+  tidyr::spread(key = Pass, value = T0) %>%
+  rename(T0.Pass.1 = '1',
+         T0.Pass.2 = '2',
+         T0.Pass.3 = '3',
+         T0.Pass.4 = '4')
+ 
+tmp <- 
+  baselineData %>% 
+  dplyr::select(Date, SessionNum, Subject, Experiment, Pass, M50) %>%
+  dplyr::group_by(Date, SessionNum, Subject, Experiment) %>%
+  tidyr::spread(key = Pass, value = M50) %>%
+  rename(M50.Pass.1 = '1',
+         M50.Pass.2 = '2',
+         M50.Pass.3 = '3',
+         M50.Pass.4 = '4')
+baselineData_wideform <- 
+  dplyr::left_join(baselineData_wideform, tmp, by = c("Date", "SessionNum", "Subject", "Experiment"))
+ 
+tmp <- 
+  baselineData %>% 
+  dplyr::select(Date, SessionNum, Subject, Experiment, Pass, MaxRate) %>%
+  dplyr::group_by(Date, SessionNum, Subject, Experiment) %>%
+  tidyr::spread(key = Pass, value = MaxRate) %>%
+  rename(MaxRate.Pass.1 = '1',
+         MaxRate.Pass.2 = '2',
+         MaxRate.Pass.3 = '3',
+         MaxRate.Pass.4 = '4')
+ 
+baselineData_wideform <- 
+  dplyr::left_join(baselineData_wideform, tmp, by = c("Date", "SessionNum", "Subject", "Experiment")) %>%
+  dplyr::arrange(Subject, Date)
+ 
+rm(tmp)
+
+# writing wideform dataframe to disk
+readr::write_csv(baselineData_wideform, file.path(dataDir, outputFileName_baseLineDates_wideform))
+```
+
+## 4.3. Data for experiment dates
+```{r}
+# Generating experiment dataframe
+# -------------------------------
+experimentData <-
+  data %>% 
+  dplyr::filter(Date >= shaStartDate)
+
+experimentSessionNum <- 
+  experimentData %>%
+  dplyr::select(Date) %>%
+  unique %>% dplyr::arrange(Date) %>%
+  dplyr::mutate(SessionNum = seq(1,32))
+
+experimentData %>% 
+  dplyr::left_join(experimentSessionNum, experimentData, by = "Date") %>%
+  dplyr::arrange(Subject, Date)
+
+# writing longform data frame to disk
+readr::write_csv(experimentData, file.path(dataDir, outputFileName_experimentDates_longform))
+
+# Generating wideform dataframe
+experimentData_wideform <- 
+  experimentData %>% 
+  dplyr::select(Date, SessionNum, Subject, Experiment, Pass, T0) %>%
+  dplyr::group_by(Date, SessionNum, Subject, Experiment) %>%
+  tidyr::spread(key = Pass, value = T0) %>%
+  rename(T0.Pass.1 = '1',
+         T0.Pass.2 = '2',
+         T0.Pass.3 = '3',
+         T0.Pass.4 = '4')
+ 
+tmp <- 
+  experimentData %>% 
+  dplyr::select(Date, SessionNum, Subject, Experiment, Pass, M50) %>%
+  dplyr::group_by(Date, SessionNum, Subject, Experiment) %>%
+  tidyr::spread(key = Pass, value = M50) %>%
+  rename(M50.Pass.1 = '1',
+         M50.Pass.2 = '2',
+         M50.Pass.3 = '3',
+         M50.Pass.4 = '4')
+experimentData_wideform <- 
+  dplyr::left_join(experimentData_wideform, tmp, by = c("Date", "SessionNum", "Subject", "Experiment"))
+ 
+tmp <- 
+  experimentData %>% 
+  dplyr::select(Date, SessionNum, Subject, Experiment, Pass, MaxRate) %>%
+  dplyr::group_by(Date, SessionNum, Subject, Experiment) %>%
+  tidyr::spread(key = Pass, value = MaxRate) %>%
+  rename(MaxRate.Pass.1 = '1',
+         MaxRate.Pass.2 = '2',
+         MaxRate.Pass.3 = '3',
+         MaxRate.Pass.4 = '4')
+ 
+experimentData_wideform <- 
+  dplyr::left_join(experimentData_wideform, tmp, by = c("Date", "SessionNum", "Subject", "Experiment"))
+ 
+rm(tmp)
+ 
+# writing wideform dataframe to disk
+readr::write_csv(experimentData_wideform, file.path(dataDir, outputFileName_experimentDates_wideform))
+```
