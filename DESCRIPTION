@@ -5,7 +5,7 @@ Authors@R: c(
   person("Suman", "Guha", email = "skguha@mclean.harvard.edu", role = c("aut")),
   person("Elena", "Chartoff", email = "echartoff@mclean.harvard.edu", role = c("cre")))
 Description: What the package does (one paragraph).
-Depends: R (>= 3.5.0)
+Depends: R (>= 3.5.0), argparser (>= 0.4), tidyverse (>= 1.3.0), lubridate (>= 1.7.4), stringr (>= 1.4.0)
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
