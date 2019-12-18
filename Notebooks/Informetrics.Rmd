@@ -1,0 +1,23 @@
+---
+title: "Informetrics"
+author: "Suman Guha"
+date: "12/18/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(httr)
+library(rvest)
+library(reutils)
+```
+
+```{bash}
+source ~/.bash_profile
+```
+
+```{bash}
+which esearch
+```
+
