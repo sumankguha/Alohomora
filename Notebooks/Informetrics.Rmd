@@ -14,10 +14,19 @@ library(reutils)
 ```
 
 ```{bash}
-source ~/.bash_profile
+# Setting path here
+export PATH=${PATH}:/Users/sumanguha/edirect
+esearch -db pubmed -query "Suman Guha[Author]" | \
+efetch -format docsum | \
+xtract -pattern DocumentSummary -element Id SortPubDate Source ISSN SortFirstAuthor LastAuthor Title
 ```
 
-```{bash}
-which esearch
+
+```{r}
+# Setting baseUrl and apiKey
+apiKey  <- "c264d1093bab7e6cc40293fba64e17dd"
+baseUrl <- ""
+
 ```
+
 
