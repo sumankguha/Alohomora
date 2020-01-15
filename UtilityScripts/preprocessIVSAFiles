@@ -95,27 +95,27 @@ makeCSV_macOS() # Parse indivual .tmp file to CSV files
 	# extracting E: F: G: fields and deleting all 0: 5: 10: ... and 0.000 values and setting them as lever press and reward times
 	# ---------------------------------------------------------------------------------------------------------------------------
 	corr_varNum=$(awk '/A:/ {print $2}' $tmpFile)
-	if [ corr_varNum > 0.000 ]
+	if [ "$corr_varNum" = "0.000" ]
 	then
-		corrLeverPress=$(awk -v s="$line1" -v e="$line2" 'NR>s && NR<e' $tmpFile | sed -e 's/.*: //g' | tr -d '\n')
-	else
 		corrLeverPress=$(awk -v s="$line1" -v e="$line2" 'NR>s && NR<e' $tmpFile | sed -e 's/.*: //g' | sed -e 's/ 0\.000//g' | tr -d '\n')
+	else
+		corrLeverPress=$(awk -v s="$line1" -v e="$line2" 'NR>s && NR<e' $tmpFile | sed -e 's/.*: //g' | tr -d '\n')
 	fi
 
 	incorr_varNum=$(awk '/B:/ {print $2}' $tmpFile)
-	if [ incorr_varNum > 0.000 ]
+	if [ "$incorr_varNum" = "0.000" ]
 	then
-		incorrLeverPress=$(awk -v s="$line2" -v e="$line3" 'NR>s && NR<e' $tmpFile | sed -e 's/.*: //g' | tr -d '\n')
-	else
 		incorrLeverPress=$(awk -v s="$line2" -v e="$line3" 'NR>s && NR<e' $tmpFile | sed -e 's/.*: //g' | sed -e 's/ 0\.000//g' | tr -d '\n')
+	else
+		incorrLeverPress=$(awk -v s="$line2" -v e="$line3" 'NR>s && NR<e' $tmpFile | sed -e 's/.*: //g' | tr -d '\n')
 	fi
 
 	reward_varNum=$(awk '/C:/ {print $2}' $tmpFile)
-	if [ reward_varNum > 0.000 ]
+	if [ "$reward_varNum" = "0.000" ]
 	then
-		rewards=$(awk -v s="$line3" -v e="$line4" 'NR>s && NR<e' $tmpFile | sed -e 's/.*: //g' | tr -d '\n')
-	else
 		rewards=$(awk -v s="$line3" -v e="$line4" 'NR>s && NR<e' $tmpFile | sed -e 's/.*: //g' | sed -e 's/ 0\.000//g' | tr -d '\n')
+	else
+		rewards=$(awk -v s="$line3" -v e="$line4" 'NR>s && NR<e' $tmpFile | sed -e 's/.*: //g' | tr -d '\n')
 	fi
 
 
