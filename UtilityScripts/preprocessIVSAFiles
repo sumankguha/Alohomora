@@ -6,7 +6,7 @@ read -d '' usage << "BLOCK"
 DESCRIPTION:
 This script runs over a day-file and splits it into  '.tmp' file for individual animal for data integrity check. Finally it saves .csv files for rewards, correct lever presses, and incorrect lever presses. The file naming convention is <DATE>_<EXPERIMENT NAME>_<GROUP>_<SUBJECT>_rewards/corrLever/incorrLever.csv. The meta data is injected into file name for analytics purposes later. The files themselves are saved in a folder(s) named as ../_tmpFiles and ../_csvFiles for tmp and csv files respectively
 
-USAGE: parseDayFile -FLAG(S)/--LONG_NAME_OF_FLAG(S) <ARGUMENTS>
+USAGE: preprocessIVSAFiles -FLAG(S)/--LONG_NAME_OF_FLAG(S) <ARGUMENTS>
 
 INPUT FLAGS:
 --file or -f	: the day file
