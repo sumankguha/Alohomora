@@ -66,16 +66,16 @@ fileSuffix = argv$fileSuffix    # parsing file name suffix from variable
 # ----------------
 fileParts <- stringr::str_split(rewardFileName, "_")[[1]] # split file name to generate metadata
 date <- fileParts[1]
-cohort <- fileParts[2]
-regimen <- fileParts[3]
-group <- fileParts[4]
-subject <- fileParts[5]
+#cohort <- fileParts[2]
+#regimen <- fileParts[3]
+#group <- fileParts[4]
+subject <- fileParts[2]
 
 # 1.1. generating file names to read from. Redundancy for operator error
 # ----------------------------------------------------------------------
-rewardsDataFile <- stringr::str_c(date, cohort, regimen, group, subject, "rewards.csv", sep = "_")
-corrLeverDataFile <- stringr::str_c(date, cohort, regimen, group, subject, "corrLever.csv", sep = "_")
-incorrLeverDataFile <- stringr::str_c(date, cohort, regimen, group, subject, "incorrLever.csv", sep = "_")
+rewardsDataFile <- stringr::str_c(date, subject, "rewards.csv", sep = "_")
+corrLeverDataFile <- stringr::str_c(date, subject, "corrLever.csv", sep = "_")
+incorrLeverDataFile <- stringr::str_c(date, subject, "incorrLever.csv", sep = "_")
 
 # ---------- debug section ----------
 #print(rewardsDataFile)
@@ -95,15 +95,15 @@ incorrLeverTimes <- readr::read_csv(incorrLeverDataFile)
 
 # 1.3 generating data frame to be saved
 # -------------------------------------
-rewardTimes <- rewardTimes %>% dplyr::mutate(date = date, cohort = cohort, regimen = regimen, group = group, subjectID = subject, eventType = "rewards")
-rewardTimes <- rewardTimes %>% dplyr::select(date, cohort, regimen, group, subjectID, eventType, eventTime)
-corrLeverTimes <- corrLeverTimes %>% dplyr::mutate(date = date, cohort = cohort, regimen = regimen, group = group, subjectID = subject, eventType = "corrLever")
-corrLeverTimes <- corrLeverTimes %>% dplyr::select(date, cohort, regimen, group, subjectID, eventType, eventTime)
-incorrLeverTimes <- incorrLeverTimes %>% dplyr::mutate(date = date, cohort = cohort, regimen = regimen, group = group, subjectID = subject, eventType = "incorrLever")
-incorrLeverTimes <- incorrLeverTimes %>% dplyr::select(date, cohort, regimen, group, subjectID, eventType, eventTime)
+rewardTimes <- rewardTimes %>% dplyr::mutate(date = date, subjectID = subject, eventType = "rewards")
+rewardTimes <- rewardTimes %>% dplyr::select(date, subjectID, eventType, eventTime)
+corrLeverTimes <- corrLeverTimes %>% dplyr::mutate(date = date, subjectID = subject, eventType = "corrLever")
+corrLeverTimes <- corrLeverTimes %>% dplyr::select(date, subjectID, eventType, eventTime)
+incorrLeverTimes <- incorrLeverTimes %>% dplyr::mutate(date = date, subjectID = subject, eventType = "incorrLever")
+incorrLeverTimes <- incorrLeverTimes %>% dplyr::select(date, subjectID, eventType, eventTime)
 output_dataTbl <- rbind(rewardTimes, corrLeverTimes, incorrLeverTimes)
 
 # 2. SAVING DATA
 # --------------
-outputFileName <- stringr::str_c(date, cohort, regimen, group, subject, "collated.csv", sep = "_")
+outputFileName <- stringr::str_c(date, subject, "collated.csv", sep = "_")
 readr::write_csv(output_dataTbl, path = outputFileName)

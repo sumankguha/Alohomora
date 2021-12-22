@@ -59,15 +59,15 @@ makeTmpFiles_macOS() # Parses individual subject/animal record into its separate
 	# --------------------------------------------
 	date="$(awk 'BEGIN {FS="!"} NR==1 {print $2}' $fileName)" 	#fist line of the day file has the date in the desired format and is preceded by ! which is used as a record separator
 	subjectList=($(awk '/Subject:/ {print $2}' $fileName)) 		#second record seems to be the name of the animals while the first record acts as the identifying pattern
-	experimentList=($(awk '/Experiment: / {print $2}' $fileName))
-	groupList=($(awk '/Group: / {print $2}' $fileName))
+	#experimentList=($(awk '/Experiment: / {print $2}' $fileName))
+	#groupList=($(awk '/Group: / {print $2}' $fileName))
 	
 	# 4. Splice and save individual animal record in .tmp files
 	# -----------------------------------------------------------
 	subjectNums=$(( ${#subjectList[@]} - 1 ))
 	for i in $(seq 0 $subjectNums)
 	do
-		tmpFile=$(echo $date"_"${experimentList[i]}"_"${groupList[i]}"_"${subjectList[$i]}.tmp)
+		tmpFile=$(echo $date"_"${subjectList[$i]}.tmp)
 		startLine=${lineNums[$i]}
 		endLine=${lineNums[(( $i + 1 ))]}
 		endLine=$(( $endLine - 1 ))
